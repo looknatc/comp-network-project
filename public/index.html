@@ -38,7 +38,9 @@
 							placeholder="Enter username..."
 							required
 						/>
+						<button type="button" id="submitUserName">Submit Username</button>
 					</div>
+					
 					<div class="form-control">
 						<label for="room">Room</label>
 						<select name="room" id="room">
@@ -57,6 +59,12 @@
 					</div>
 					<button type="submit" class="btn">Join Chat</button>
 				</form>
+				<div class="index-rightbar">
+					<!-- <h3><i class="fas fa-comments"></i> Room Name:</h3>
+					<h2 id="room-name"></h2> -->
+					<h3><i class="fas fa-users"></i>DM</h3>
+					<ul id="DM"></ul>
+				</div>
 			</main>
 		</div>
 	</body>
@@ -77,7 +85,7 @@ function addUserToList(name) {
   $('#users').append(listItem);
 }
 function outputRoomList(rooms){
-	$('#room').empty()
+	$('#room').empty();
 	var roomSelect = document.getElementById("room");
 	for(r in rooms){
 		var roomOption = document.createElement("option");
@@ -88,6 +96,7 @@ function outputRoomList(rooms){
 	}
 }
 function outputAllUsers(users){
+	$('#users').empty();
 	for( i in users){
 		// console.log(users[i],users[i].username)
 		addUserToList(users[i].username)
@@ -108,13 +117,20 @@ $(function() {
 		
 	});
 
-	$()
+	$("#submitUserName").click(function(){
+		var username = $("#username").val()
+		socket.emit('userJoin', {username});
+	});
 
 	socket.emit("allUser",{});
 	socket.on("allUserResponse",(users) =>{
 		console.log("allUserResponse",users);
 		outputAllUsers(users);
 	});
+	// socket.on("userJoin",(users) =>{
+	// 	console.log("userJoin",users);
+	// 	outputAllUsers(users);
+	// });
 
 	// socket.emit('NaoNao', {a:"b" });
 
@@ -123,6 +139,10 @@ $(function() {
 	socket.on("roomListResponse",(rooms)=>{
 		console.log(rooms);
 		outputRoomList(rooms);
+	});
+
+	socket.on("directMessage",(x)=>{
+		console.log("directMessage",x);
 	});
 	// var roomSelect = document.getElementById("room");
 	//   var x = ["ff","gg"]

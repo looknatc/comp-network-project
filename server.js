@@ -7,13 +7,26 @@ const formatMessage = require("./utils/messages");
 // const redis = require("redis");
 // require("dotenv").config();
 // const { createClient } = redis;
+
+// {A_person1_B_person2:[] }
+const dmStore = [
+  {
+    owner: "A_person1_B_person2",
+    messages:[]
+  }
+];
 const {
   userJoin,
   getCurrentUser,
   userLeave,
   getRoomUsers,
-  allUsers
+  allUsers,
+  findUser,
+  myUserJoin,
+  myAllUsers
 } = require("./utils/users");
+// var myModule = require("./utils/users");
+// var myUsers = myModule.myUsers;
 
 const app = express();
 const server = http.createServer(app);
@@ -33,11 +46,52 @@ const botName = "ChatCord Bot";
 
 const roomList = ["roomA","roomB"]
 // // Run when client connects
+function getOwner(a,b){
+  if(a<b){
+    return "A?"+a+"?B?"+b;
+  }else{
+    return "A?"+b+"?B?"+a;
+  }
+}
+function insertMessage(obj){
+  var to = obj.to;
+  var from = obj.from;
+  var msg = obj.msg;
+  var owner = getOwner(to,from);
+  for(i in dmStore){
+    elem = dmStore[i];
+    if(elem.owner == owner){
+      elem.messages.push({
+        content:msg,
+        from:from
+      })
+      console.log(dmStore[i]);
+      return
+    }
+  }
+  dmStore.push({
+    owner: owner,
+    messages:[{
+      content:msg,
+      from:from
+    }]
+  })
+  console.log(dmStore);
+}
+
 io.on("connection", (socket) => {
   // console.log('New WS Connection...');
 
   // Welcome current user
   // socket.emit('message','Welcome to ChatCord!');
+  socket.on("startDM",({from})=>{
+    console.log("allUser",allUsers());
+    const user = userJoin(socket.id, from,"DM");
+    // const user = myUserJoin(socket.id, username);
+    const allUser = allUsers();
+    console.log(user,allUser)
+    io.emit("allUserResponse",allUser);
+  });
 
   socket.on("roomList",()=>{
     console.log('get roomList');
@@ -57,10 +111,29 @@ io.on("connection", (socket) => {
 
   socket.on("directMessage",({content,to,from})=>{
     console.log("receive message from",to,"content is",content);
-    socket.to(to).emit("directMessage",{
-      content,
-      from: socket.id,
+    var owner = getOwner(to,from);
+    insertMessage({
+      to:to,
+      from:from,
+      msg:content
     });
+    toUser = findUser(to);
+    console.log("toUser",toUser);
+    // console.log(getOwner(to,from),getOwner(from,to));
+    socket.to(toUser.id).emit("directMessage",{
+      content,
+      from: from,
+      fromSocket:socket.id,
+    });
+  });
+
+  socket.on("userJoin",({username})=>{
+    console.log("userJoin",username)
+    const user = userJoin(socket.id, username,"DM");
+    // const user = myUserJoin(socket.id, username);
+    const allUser = allUsers();
+    console.log(user,allUser)
+    io.emit("allUserResponse",allUser);
   });
 
 
@@ -90,7 +163,7 @@ io.on("connection", (socket) => {
   // Runs when client disconnects
   socket.on('disconnect',()=>{
     const user = userLeave(socket.id);
-
+    console.log("disconnect",user)
     if(user){
       io.to(user.room).emit(
         'message',
@@ -136,9 +209,7 @@ io.on("connection", (socket) => {
     // console.log(msg);
     const user = getCurrentUser(socket.id);
     io.to(user.room).emit("message",formatMessage(user.username, msg))
-    // const user = getCurrentUser(socket.id);
 
-    // io.to(user.room).emit("message", formatMessage(user.username, msg));
   });
 
 //   // Runs when client disconnects

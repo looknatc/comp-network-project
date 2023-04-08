@@ -14,6 +14,9 @@ const { username, room } = Qs.parse(location.search, {
 // console.log(username,room);
 
 const socket = io();
+// socket.on("connect", () => {
+//   console.log(socket.id); // x8WIv7-mJelg7on_ALbx
+// });
 
 // Join chatroom
 socket.emit('joinRoom', { username, room });
@@ -75,6 +78,9 @@ function outputMessage(message) {
   // div.appendChild(para);
   document.querySelector('.chat-messages').appendChild(div);
 }
+socket.on("directMessage",(x)=>{
+  console.log("directMessage",x);
+});
 
 // Add room name to DOM
 function outputRoomName(room) {

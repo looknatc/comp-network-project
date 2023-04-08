@@ -1,4 +1,12 @@
 const users = [];
+var myUsers= [];
+
+function myAllUsers(){
+  // const uniqueUsers = Array.from(new Set(users.map(user => user.username))).map(username => {
+  //   return users.find(user => user.username === username);
+  // });
+  return myUsers;
+}
 
 function allUsers(){
   const uniqueUsers = Array.from(new Set(users.map(user => user.username))).map(username => {
@@ -15,6 +23,23 @@ function userJoin(id, username, room) {
   console.log(users);
 
   return user;
+}
+
+function myUserJoin(id, username) {
+  const user = { id, username};
+
+  myUsers.push(user);
+  console.log(myUsers);
+
+  return user;
+}
+
+function findUser(username){
+  for(i in users){
+    if(users[i].username == username){
+      return users[i];
+    }
+  }
 }
 
 // Get current user
@@ -41,5 +66,9 @@ module.exports = {
   getCurrentUser,
   userLeave,
   getRoomUsers,
-  allUsers
+  allUsers,
+  findUser,
+  myUserJoin,
+  myAllUsers
 };
+exports.myUsers = myUsers;

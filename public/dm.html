@@ -56,28 +56,56 @@
 var name = new URLSearchParams(window.location.search).get('name');
 var from = new URLSearchParams(window.location.search).get('from');
 console.log(name,from);
+function outputMessage(message) {
+  const div = document.createElement('div');
+  div.classList.add('message');
+  div.innerHTML = `<p class="meta">${message.from} </p> 
+  <p class="text">
+    ${message.content}
+  </p>`;
+  // const p = document.createElement('p');
+  // p.classList.add('meta');
+  // p.innerText = message.username;
+  // p.innerHTML += `<span>${message.time}</span>`;
+  // div.appendChild(p);
+  // const para = document.createElement('p');
+  // para.classList.add('text');
+  // para.innerText = message.text;
+  // div.appendChild(para);
+  document.querySelector('.chat-messages').appendChild(div);
+}
 $(function(){
     console.log( "ready!" );
 	const socket = io();
+
+    socket.emit("startDM",{from});
     $("#person-name").html(name);
 
     $("#dm-form").submit(function(e) {
         e.preventDefault();
 
         // Get message text
-        const msg = $(this).find('input[name="msg"]').val();
-
-        socket.emit('directMessage', {
-            msg,
+        const msg = $('#msg').val();
+        console.log(msg,"msg")
+        var value = {
+            content:msg,
             to:name,
             from:from,
-        });
+        }
+
+        socket.emit('directMessage', value);
+        outputMessage(value);
 
 
         // Clear input
         e.target.elements.msg.value = '';
         e.target.elements.msg.focus();
-    });   
+    });
+    
+    socket.on("directMessage",(x)=>{
+		console.log("directMessage",x);
+        outputMessage(x);
+	});
 });
 
 
