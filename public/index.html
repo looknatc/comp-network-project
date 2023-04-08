@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css"
+			integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk="
+			crossorigin="anonymous"
+		/>
+		<link rel="stylesheet" href="css/style.css" />
+		<title>ChatCord App</title>
+		<script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
+		<!-- <script src=”https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js”></script> -->
+		<script type="test/javascript" src="utils/helper.js"></script>
+	</head>
+	<body>
+		<div class="join-container">
+			<header class="join-header">
+				<h1><i class="fas fa-smile"></i> ChatCord</h1>
+			</header>
+			<main class="join-main">
+				<div class="index-sidebar">
+					<!-- <h3><i class="fas fa-comments"></i> Room Name:</h3>
+					<h2 id="room-name"></h2> -->
+					<h3><i class="fas fa-users"></i>Online Users</h3>
+					<ul id="users"></ul>
+				</div>
+				<form action="chat.html">
+					<div class="form-control">
+						<label for="username">Username</label>
+						<input
+							type="text"
+							name="username"
+							id="username"
+							placeholder="Enter username..."
+							required
+						/>
+					</div>
+					<div class="form-control">
+						<label for="room">Room</label>
+						<select name="room" id="room">
+
+						</select>
+					</div>
+					<div class="form-control" id="newRoom">
+						<label for="create-room">Create-Room</label>
+						<input
+							type="text"
+							name="newRoomName"
+							id="newRoomName"
+							placeholder="Enter Room Name..."
+						/>
+						<button type="button" id="submitNameBtn">New Room</button>
+					</div>
+					<button type="submit" class="btn">Join Chat</button>
+				</form>
+			</main>
+		</div>
+	</body>
+</html>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+// function Remove_options(){
+// 	$('#room').empty()
+// }
+function addUserToList(name) {
+  // Create a new list item with the user's name and a DM button
+  var listItem = $('<li>').append(
+    $('<span>').text(name),
+    $('<button>').text('DM').addClass('dm-btn')
+  );
+  
+  // Add the list item to the users list
+  $('#users').append(listItem);
+}
+function outputRoomList(rooms){
+	$('#room').empty()
+	var roomSelect = document.getElementById("room");
+	for(r in rooms){
+		var roomOption = document.createElement("option");
+		// console.log(r)
+		roomOption.text = rooms[r];
+		roomOption.value = rooms[r];
+		roomSelect.add(roomOption);
+	}
+}
+function outputAllUsers(users){
+	for( i in users){
+		// console.log(users[i],users[i].username)
+		addUserToList(users[i].username)
+	}
+
+}
+
+$(function() {
+    console.log( "ready!" );
+	const socket = io();
+
+	$("#submitNameBtn").click(function(){
+		var roomName = $("#newRoomName").val()
+		// console.log(roomName)
+		if(roomName != ""){
+			socket.emit('newRoom', {roomName});
+		}
+		
+	});
+
+	$()
+
+	socket.emit("allUser",{});
+	socket.on("allUserResponse",(users) =>{
+		console.log("allUserResponse",users);
+		outputAllUsers(users);
+	});
+
+	// socket.emit('NaoNao', {a:"b" });
+
+
+	socket.emit('roomList', {});
+	socket.on("roomListResponse",(rooms)=>{
+		console.log(rooms);
+		outputRoomList(rooms);
+	});
+	// var roomSelect = document.getElementById("room");
+	//   var x = ["ff","gg"]
+	//   for(r in rooms){
+	// 	var roomOption = document.createElement("option");
+	// 	// console.log(r)
+	// 	roomOption.text = x[r];
+	// 	roomOption.value = x[r];
+	// 	roomSelect.add(roomOption);
+	//   }
+	socket.on('roomUsers', ({ room, users }) => {
+		outputRoomName(room);
+		outputUsers(users);
+	});
+});
+$(document).on('click', '.dm-btn', function() {
+  var name = $(this).prev().text();
+  var from = $("#username").val();
+  console.log(name);
+  window.location = '../dm.html?name=' + encodeURIComponent(name)+"&from="+encodeURIComponent(from);
+  
+});
+
+</script>
