@@ -54,10 +54,11 @@ function getOwner(a,b){
   }
 }
 function insertMessage(obj){
-  var to = obj.to;
+  // var to = obj.to;
   var from = obj.from;
   var msg = obj.msg;
-  var owner = getOwner(to,from);
+  // var owner = getOwner(to,from);
+  var owner = obj.room;
   for(i in dmStore){
     elem = dmStore[i];
     if(elem.owner == owner){
@@ -113,7 +114,7 @@ io.on("connection", (socket) => {
     console.log("receive message from",to,"content is",content);
     var owner = getOwner(to,from);
     insertMessage({
-      to:to,
+      room:owner,
       from:from,
       msg:content
     });
@@ -205,9 +206,29 @@ io.on("connection", (socket) => {
 //   });
 
   // Listen for chatMessage
+  socket.on("getPastMessages",(roomName)=>{
+    console.log("getPastMessages",roomName.roomName);
+    var ret;
+    for(i in dmStore){
+      console.log("dmStore[i]",dmStore[i],dmStore[i].owner,roomName.roomName);
+      if(dmStore[i].owner === roomName.roomName){
+        console.log("find ret",ret);
+        ret = dmStore[i].messages;
+        break;
+      }
+    }
+    // var ret= dmStore.filter(room => room.owner === roomName);
+    console.log("ret",ret);
+    socket.emit("getPastMessagesResponse",{ret});
+  });
   socket.on("chatMessage", (msg) => {
     // console.log(msg);
     const user = getCurrentUser(socket.id);
+    insertMessage({
+      room:user.room,
+      from:user.username,
+      msg:msg
+    });
     io.to(user.room).emit("message",formatMessage(user.username, msg))
 
   });
