@@ -180,11 +180,7 @@ a {
 	margin-top: 20px;
 	width: 100%;
 }
-.login{
-	display: grid;
-	padding: 30px 40px;
-	background: var(--dark-color-b);
-}
+
 .index-sidebar {
 	background: var(--dark-color-b);
     color: #fff;
@@ -219,6 +215,60 @@ a {
 	grid-template-columns: 1fr 3fr;
 }
 
+/* login-page */
+.login-container {
+	max-width: 400px;
+	margin: 80px auto;
+	color:#E0D8C3;
+}
+
+.login-header {
+	text-align: center;
+	padding: 20px;
+	background: #065125;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+
+.login-main{
+	padding: 30px 40px;
+	background: #DDA033;
+	min-height: 250px;
+}
+
+.login-block{
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	padding: 30px 40px;
+	text-align: center;
+}
+
+grid{
+	padding-bottom: 10px;
+}
+
+input[type=text]{
+	width: 100%;
+    padding: 12px 20px;
+  	margin: 8px 0;
+  	display: inline-block;
+  	border: 1px solid #ccc;
+  	border-radius: 4px;
+  	box-sizing: border-box;
+}
+
+#submitUserName {
+	border: none;
+	background-color: #fff;
+	color: var(--dark-color-b);
+	text-align: center;
+	display: inline-block;
+	margin: 4px 2px;
+	padding: 8px 12px;;
+	cursor: pointer;
+	border-radius: 4px;
+  }
 @media (max-width: 700px) {
 	.chat-main {
 		display: block;

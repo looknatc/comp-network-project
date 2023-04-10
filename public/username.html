@@ -14,25 +14,22 @@
   </head>
 
   <body>
-    <div class="join-container">
-        <header class="join-header">
+    <div class="login-container">
+        <header class="login-header">
             <h1><i class="fas fa-smile"></i> ChatCord</h1>
         </header>
-        <main class="login">
-            
-                <div class="form-control">
-                    <label for="username">Username</label>
-                    <input
-                        type="text"
-                        name="username"
-                        id="username"
-                        placeholder="Enter username..."
-                        required
-                    />
-                    <button type="button" id="submitUserName">Submit Username</button>
-                </div>
-           
-            
+        <main class="login-main">
+          <grid class="login-block">
+            <grid><label for="username"><subtitle>Username</subtitle></label></grid>
+            <grid><input
+              type="text"
+              name="username"
+              id="username"
+              placeholder="Enter username..."
+              required
+            /></grid>
+          <grid><button type="button" id="submitUserName">Submit Username</button></grid>
+          </grid>     
         </main>
     </div>
   </body>
