@@ -4,6 +4,7 @@ const roomName = document.getElementById("room-name");
 const userList = document.getElementById("users");
 const leaveButton = document.getElementById("leave-btn");
 const roomList = document.getElementById("room");
+const myName = document.getElementById("me");
 
 // const rooms = ['Java','PHP']
 // Get username and room from URL
@@ -105,6 +106,8 @@ function outputUsers(users) {
       )
       .join("")}
   `;
+
+  myName.innerHTML = `${username}`;
   // userList.innerHTML = '';
   // users.forEach((user) => {
   //   const li = document.createElement('li');
