@@ -180,6 +180,11 @@ a {
 	margin-top: 20px;
 	width: 100%;
 }
+.login{
+	display: grid;
+	padding: 30px 40px;
+	background: var(--dark-color-b);
+}
 .index-sidebar {
 	background: var(--dark-color-b);
     color: #fff;
