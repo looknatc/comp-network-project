@@ -16,5 +16,13 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/looknatc/comp-network-project.git"
+  },
+  "bugs": {
+    "url": "https://github.com/looknatc/comp-network-project/issues"
+  },
+  "homepage": "https://github.com/looknatc/comp-network-project#readme"
 }
