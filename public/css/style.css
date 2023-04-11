@@ -131,13 +131,13 @@ a {
 .join-container {
 	max-width: 700px;
 	margin: 80px auto;
-	color: #fff;
+	color:#E0D8C3;
 }
 
 .join-header {
 	text-align: center;
 	padding: 20px;
-	background: var(--dark-color-a);
+	background: #0D97AC;
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
 }
@@ -146,7 +146,9 @@ a {
 	display: grid;
 	grid-template-columns: 1fr 3fr;
 	padding: 30px 40px;
-	background: var(--dark-color-b);
+	background: #DDA033;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
 }
 
 .join-main p {
@@ -164,28 +166,46 @@ a {
 
 .join-main input[type='text'] {
 	font-size: 16px;
-	padding: 5px;
 	height: 40px;
 	width: 100%;
+    padding: 12px 20px;
+  	margin: 8px 0;
+  	display: inline-block;
+  	border: 1px solid #E0D8C3;
+  	border-radius: 4px;
+  	box-sizing: border-box;
 }
 
 .join-main select {
-	font-size: 16px;
-	padding: 5px;
 	height: 40px;
 	width: 100%;
+	font-size: 16px;
+    padding: 12px 20px;
+  	margin: 8px 0;
+  	display: inline-block;
+  	border: 1px solid #E0D8C3;
+  	border-radius: 4px;
+  	box-sizing: border-box;
 }
 
-.join-main .btn {
-	margin-top: 20px;
-	width: 100%;
+.join-main .btn,#submitNameBtn {
+	border: none;
+	background-color:#E0D8C3;
+	color: #065125;
+	text-align: center;
+	display: inline-block;
+	margin: 4px 0px;
+	padding: 8px 12px;;
+	cursor: pointer;
+	border-radius: 4px;
+	width: "100%";
 }
 
 .index-sidebar {
-	background: var(--dark-color-b);
-    color: #fff;
+    color:#E0D8C3 ;
     padding: 20px 20px 60px;
     overflow-y: auto;
+	background: #DDA033;
 
 }
 
@@ -225,7 +245,7 @@ a {
 .login-header {
 	text-align: center;
 	padding: 20px;
-	background: #065125;
+	background: #0D97AC;
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
 }
@@ -234,6 +254,8 @@ a {
 	padding: 30px 40px;
 	background: #DDA033;
 	min-height: 250px;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
 }
 
 .login-block{
@@ -248,20 +270,25 @@ grid{
 	padding-bottom: 10px;
 }
 
+#login-label{
+	font-size: 24px;
+	color:#E0D8C3;
+}
 input[type=text]{
+	font-size: 16px;
 	width: 100%;
     padding: 12px 20px;
   	margin: 8px 0;
   	display: inline-block;
-  	border: 1px solid #ccc;
+  	border: 1px solid #E0D8C3;
   	border-radius: 4px;
   	box-sizing: border-box;
 }
 
 #submitUserName {
 	border: none;
-	background-color: #fff;
-	color: var(--dark-color-b);
+	background-color:#E0D8C3;
+	color: #065125;
 	text-align: center;
 	display: inline-block;
 	margin: 4px 2px;
