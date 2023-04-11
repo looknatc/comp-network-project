@@ -28,18 +28,7 @@
 					<h3><i class="fas fa-users"></i>Online Users</h3>
 					<ul id="users"></ul>
 				</div>
-				<form action="chat.html">
-					<div class="form-control">
-						<label for="username">Username</label>
-						<input
-							type="text"
-							name="username"
-							id="username"
-							placeholder="Enter username..."
-							required
-						/>
-						<button type="button" id="submitUserName">Submit Username</button>
-					</div>
+				<form id="chat-form">
 					
 					<div class="form-control">
 						<label for="room">Room</label>
@@ -66,51 +55,41 @@
 </html>
 <script src="/socket.io/socket.io.js"></script>
 <script>
-// function Remove_options(){
-// 	$('#room').empty()
-// }
-function addUserToList(name) {
-  // Create a new list item with the user's name and a DM button
-  var listItem = $('<li>').append(
-    $('<span>').text(name),
-    $('<button>').text('DM').addClass('dm-btn')
-  );
-  
-  // Add the list item to the users list
-  $('#users').append(listItem);
-}
-function outputRoomList(rooms){
-	$('#room').empty();
-	var roomSelect = document.getElementById("room");
-	for(r in rooms){
-		var roomOption = document.createElement("option");
-		// console.log(r)
-		roomOption.text = rooms[r];
-		roomOption.value = rooms[r];
-		roomSelect.add(roomOption);
-	}
-}
-function outputAllUsers(users){
-	$('#users').empty();
-	for( i in users){
-		// console.log(users[i],users[i].username)
-		addUserToList(users[i].username)
+
+	function addUserToList(name) {
+		// Create a new list item with the user's name and a DM button
+		var listItem = $('<li>').append(
+			$('<span>').text(name),
+			$('<button>').text('DM').addClass('dm-btn')
+		);
+		// Add the list item to the users list
+		$('#users').append(listItem);
 	}
 
-}
+	function outputRoomList(rooms){
+		$('#room').empty();
+		var roomSelect = document.getElementById("room");
+		for(r in rooms){
+			var roomOption = document.createElement("option");
+			// console.log(r)
+			roomOption.text = rooms[r];
+			roomOption.value = rooms[r];
+			roomSelect.add(roomOption);
+		}
+	}
+
+	function outputAllUsers(users){
+		$('#users').empty();
+		for( i in users){
+			// console.log(users[i],users[i].username)
+			addUserToList(users[i].username)
+		}
+
+	}
 
 $(function() {
     console.log( "ready!" );
 	const socket = io();
-
-	$("#submitNameBtn").click(function(){
-		var roomName = $("#newRoomName").val()
-		// console.log(roomName)
-		if(roomName != ""){
-			socket.emit('newRoom', {roomName});
-		}
-		
-	});
 
 	$("#submitUserName").click(function(){
 		var username = $("#username").val()
@@ -119,16 +98,9 @@ $(function() {
 
 	socket.emit("allUser",{});
 	socket.on("allUserResponse",(users) =>{
-		console.log("allUserResponse",users);
+		console.log("show users ",users);
 		outputAllUsers(users);
 	});
-	// socket.on("userJoin",(users) =>{
-	// 	console.log("userJoin",users);
-	// 	outputAllUsers(users);
-	// });
-
-	// socket.emit('NaoNao', {a:"b" });
-
 
 	socket.emit('roomList', {});
 	socket.on("roomListResponse",(rooms)=>{
@@ -139,26 +111,34 @@ $(function() {
 	socket.on("directMessage",(x)=>{
 		console.log("directMessage",x);
 	});
-	// var roomSelect = document.getElementById("room");
-	//   var x = ["ff","gg"]
-	//   for(r in rooms){
-	// 	var roomOption = document.createElement("option");
-	// 	// console.log(r)
-	// 	roomOption.text = x[r];
-	// 	roomOption.value = x[r];
-	// 	roomSelect.add(roomOption);
-	//   }
+	
 	socket.on('roomUsers', ({ room, users }) => {
 		outputRoomName(room);
 		outputUsers(users);
 	});
+
+
+
+	//when submit form go to chat in chosen room 
+	$("#chat-form").submit(function(event){
+		event.preventDefault(); // prevent the default form submission
+
+		const urlParams = new URLSearchParams(window.location.search);
+		const username = urlParams.get('username');
+		var selectedRoom = $("#room option:selected").val();
+		
+		window.location.href = '/chat.html?username=' + username + "&room=" + selectedRoom;
+		 
+	});
+
+
 });
-$(document).on('click', '.dm-btn', function() {
-  var name = $(this).prev().text();
-  var from = $("#username").val();
-  console.log(name);
-  window.location = '../dm.html?name=' + encodeURIComponent(name)+"&from="+encodeURIComponent(from);
-  
-});
+	$(document).on('click', '.dm-btn', function() {
+	var name = $(this).prev().text();
+	var from = $("#username").val();
+	console.log(name);
+	window.location = '../dm.html?name=' + encodeURIComponent(name)+"&from="+encodeURIComponent(from);
+	
+	});
 
 </script>

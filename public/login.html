@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css"
+			integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk="
+			crossorigin="anonymous"
+		/>
+		<link rel="stylesheet" href="css/style.css" />
+		<title>ChatCord App</title>
+		<script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
+		<!-- <script src=”https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js”></script> -->
+		<script type="test/javascript" src="utils/helper.js"></script>
+	</head>
+	<body>
+		<div class="join-container">
+			<header class="join-header">
+				<h1><i class="fas fa-smile"></i> ChatCord</h1>
+			</header>
+			<main class="join-main">
+				<div class="index-sidebar">
+					<h3>Welcome to ChatCord</h3>
+				</div>
+				<form id="username-form">
+					<div class="form-control">
+						<label for="username">Username</label>
+						<input
+							type="text"
+							name="username"
+							id="username"
+							placeholder="Enter username..."
+							required
+						/>
+					</div>
+				
+					<!-- FIX UI -->
+					<input type="submit" value="test">
+				</form>
+
+			</main>
+		</div>
+	</body>
+</html>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    
+    $(function() {
+	const socket = io();
+
+	$("#username-form").submit(function(event){
+		event.preventDefault(); // prevent the default form submission
+
+		var username = $("#username").val()
+		
+		 // Emit the checkUsername event with the username value
+		 socket.emit('checkUsername', username, function(unique) {
+          if (unique) {
+            // Redirect the user to the index.html page with the username as a query parameter
+			
+            window.location.href = '/index.html?username=' + username;
+          } else {
+            // Display an error message to the user
+            alert('Username already taken. Please choose another username.');
+          }
+        });
+	});	
+	
+});
+  
+</script>

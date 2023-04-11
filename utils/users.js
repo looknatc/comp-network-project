@@ -1,35 +1,32 @@
+//stroe users in each room {id, username, room}
 const users = [];
-var myUsers= [];
+//store all users in system {id, username}
+var allUsers= [];
 
-function myAllUsers(){
-  // const uniqueUsers = Array.from(new Set(users.map(user => user.username))).map(username => {
-  //   return users.find(user => user.username === username);
-  // });
-  return myUsers;
+function getAllUserRoom(targetRoom){
+  return users.filter((user) => user.room === targetRoom);
 }
 
-function allUsers(){
-  const uniqueUsers = Array.from(new Set(users.map(user => user.username))).map(username => {
-    return users.find(user => user.username === username);
-  });
-  return uniqueUsers
+//return user in system
+function getAllUsers(){
+  return allUsers;
 }
 
-// Join user to chat
+// user into chat room
 function userJoin(id, username, room) {
   const user = { id, username, room };
-
   users.push(user);
   console.log(users);
 
   return user;
 }
 
-function myUserJoin(id, username) {
+//user join in system
+function userJoinSystem(id, username) {
   const user = { id, username};
 
-  myUsers.push(user);
-  console.log(myUsers);
+  allUsers.push(user);
+  console.log("userJoinSystem ", allUsers);
 
   return user;
 }
@@ -61,14 +58,24 @@ function getRoomUsers(room) {
   return users.filter(user => user.room === room);
 }
 
+function isUniqueUsername(username){
+  const existingUser = allUsers.find(user => user.username === username);
+    if (existingUser) {
+      return false;
+    }
+    return true;
+
+}
+
 module.exports = {
   userJoin,
   getCurrentUser,
   userLeave,
   getRoomUsers,
-  allUsers,
+  getAllUsers,
   findUser,
-  myUserJoin,
-  myAllUsers
+  userJoinSystem,
+  getAllUserRoom,
+  isUniqueUsername
 };
-exports.myUsers = myUsers;
+exports.allUsers = allUsers;
