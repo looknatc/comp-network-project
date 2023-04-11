@@ -11,6 +11,16 @@ const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
 });
 
+function outputMessage2(message) {
+  const div = document.createElement('div');
+  div.classList.add('message');
+  div.innerHTML = `<p class="meta">${message.from} <span>${message.time}</span></p> 
+  <p class="text">
+    ${message.content}
+  </p>`;
+
+  document.querySelector('.chat-messages').appendChild(div);
+}
 // console.log(username,room);
 
 const socket = io();
@@ -20,6 +30,16 @@ const socket = io();
 
 // Join chatroom
 socket.emit('joinRoom', { username, room });
+socket.emit("getPastMessages",{roomName:room});
+socket.on("getPastMessagesResponse",(response)=>{
+    console.log("PastMessagesResponse");
+    console.log(response);
+    for(i in response.ret){
+      console.log(i,response.ret[i]);
+      outputMessage2(response.ret[i]);
+    }
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+});
 
 // Get room and users
 socket.on('roomUsers', ({ room, users }) => {
@@ -63,9 +83,9 @@ chatForm.addEventListener('submit', (e) => {
 function outputMessage(message) {
   const div = document.createElement('div');
   div.classList.add('message');
-  div.innerHTML = `<p class="meta">${message.username} <span>${message.time}</span></p> 
+  div.innerHTML = `<p class="meta">${message.from} <span>${message.time}</span></p> 
   <p class="text">
-    ${message.text}
+    ${message.content}
   </p>`;
   // const p = document.createElement('p');
   // p.classList.add('meta');
