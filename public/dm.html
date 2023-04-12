@@ -83,14 +83,14 @@ function outputMessage2(message) {
   const div = document.createElement('div');
   if (message.username === from){
     div.classList.add('message-sender');
-  div.innerHTML = `<p class="meta">${message.username} <span>${message.time}</span></p> 
+  div.innerHTML = `<p class="meta">${message.from} <span>${message.time}</span></p> 
   <p class="text">
-    ${message.text}
+    ${message.content}
   </p>`;}else{
     div.classList.add('message-receiver');
-  div.innerHTML = `<p class="meta">${message.username} <span>${message.time}</span></p> 
+  div.innerHTML = `<p class="meta">${message.from} <span>${message.time}</span></p> 
   <p class="text">
-    ${message.text}
+    ${message.content}
   </p>`;
   }
 
@@ -120,8 +120,9 @@ $(function(){
     socket.on("getPastMessagesResponse",(response)=>{
         console.log(response);
         for(i in response.ret){
-            outputMessage(response.ret[i]);
+            outputMessage2(response.ret[i]);
         }
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     });
     socket.on('message', (message) => {
         console.log(message);
