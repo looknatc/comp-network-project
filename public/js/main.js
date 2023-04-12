@@ -12,16 +12,16 @@ const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
 });
 
-function outputMessage2(message) {
-  const div = document.createElement('div');
-  div.classList.add('message');
-  div.innerHTML = `<p class="meta">${message.from} <span>${message.time}</span></p> 
-  <p class="text">
-    ${message.content}
-  </p>`;
+// function outputMessage2(message) {
+//   const div = document.createElement('div');
+//   div.classList.add('message');
+//   div.innerHTML = `<p class="meta">${message.from} <span>${message.time}</span></p> 
+//   <p class="text">
+//     ${message.content}
+//   </p>`;
 
-  document.querySelector('.chat-messages').appendChild(div);
-}
+//   document.querySelector('.chat-messages').appendChild(div);
+// }
 // console.log(username,room);
 
 const socket = io();
@@ -37,7 +37,7 @@ socket.on("getPastMessagesResponse",(response)=>{
     console.log(response);
     for(i in response.ret){
       console.log(i,response.ret[i]);
-      outputMessage2(response.ret[i]);
+      outputMessage(response.ret[i]);
     }
     chatMessages.scrollTop = chatMessages.scrollHeight;
 });
@@ -83,7 +83,7 @@ chatForm.addEventListener("submit", (e) => {
 function outputMessage(message) {
   const div = document.createElement("div");
 
-  if (message.username === username) {
+  if (message.from === username) {
     div.classList.add("message-sender");
     div.innerHTML = `<p class="meta">${message.from} <span>${message.time}</span></p> 
   <p class="text">
