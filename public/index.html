@@ -67,6 +67,7 @@
 	}
 
 	function outputRoomList(rooms){
+		console.log("outputRoomList");
 		$('#room').empty();
 		var roomSelect = document.getElementById("room");
 		for(r in rooms){
@@ -90,6 +91,14 @@
 $(function() {
     console.log( "ready!" );
 	const socket = io();
+	$("#submitNameBtn").click(function(){
+		var roomName = $("#newRoomName").val()
+		console.log(roomName)
+		if(roomName != ""){
+			socket.emit('newRoom', {roomName});
+		}
+
+	});
 
 	$("#submitUserName").click(function(){
 		var username = $("#username").val()
