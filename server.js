@@ -105,7 +105,10 @@ io.on("connection", (socket) => {
       userJoinSystem(socket.id, username);
       const allUser = getAllUsers();
       io.emit("allUserResponse", allUser);
-    } 
+    } else{
+      // console.log("usernameNotUnique");
+      // socket.emit("usernameNotUnique",{msg:`your username is already used by ${username}, continue if you are ${username}.`});
+    }
   });
 
 

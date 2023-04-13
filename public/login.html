@@ -48,7 +48,7 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
     
-    $(function() {
+$(function() {
 	const socket = io();
 
 	$("#username-form").submit(function(event){
@@ -64,10 +64,19 @@
             window.location.href = '/index.html?username=' + username;
           } else {
             // Display an error message to the user
-            alert('Username already taken. Please choose another username.');
+            // alert('Username already taken. Please choose another username.');
+			const confirmUsername = confirm(`your username is already used, continue if you are ${username}.`);
+			if (confirmUsername) {
+				// window.location = '../index.html';
+				socket.emit('userJoin', {username});
+				window.location.href = '/index.html?username=' + username;
+			} else {
+			}
           }
         });
 	});	
+
+	
 	
 });
   
