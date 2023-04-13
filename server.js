@@ -21,10 +21,11 @@ const {
   getCurrentUser,
   userLeave,
   getRoomUsers,
-  allUsers,
   findUser,
-  myUserJoin,
-  myAllUsers
+  userJoinSystem,
+  getAllUserRoom,
+  isUniqueUsername,
+  getAllUsers
 } = require("./utils/users");
 // var myModule = require("./utils/users");
 // var myUsers = myModule.myUsers;
@@ -35,8 +36,7 @@ const io = socketio(server);
 const moment = require('moment');
 
 // // Set static folder
-app.use(express.static(path.join(__dirname, "public")));
-
+app.use(express.static(path.join(__dirname, "public"), {index: "login.html"}));
 const botName = "ChatCord Bot";
 
 // (async () => {
@@ -86,15 +86,36 @@ function insertMessage(obj){
 }
 
 io.on("connection", (socket) => {
-  // console.log('New WS Connection...');
 
   // Welcome current user
   // socket.emit('message','Welcome to ChatCord!');
+
+  // Listen for the checkUsername event
+  socket.on('checkUsername', (username, callback) => {
+    console.log(`Checking username: ${username}`);
+    
+    // Check if the username is unique
+    const unique = isUniqueUsername(username);
+
+    // Emit the uniqueUsername event with the boolean value
+    callback(unique);
+
+    if (unique) {
+      // Add the username to the usernames array
+      userJoinSystem(socket.id, username);
+      const allUser = getAllUsers();
+      io.emit("allUserResponse", allUser);
+    } else{
+      // console.log("usernameNotUnique");
+      // socket.emit("usernameNotUnique",{msg:`your username is already used by ${username}, continue if you are ${username}.`});
+    }
+  });
+
+
   socket.on("startDM",({from})=>{
-    console.log("allUser",allUsers());
+    console.log("allUser",getAllUsers());
     const user = userJoin(socket.id, from,"DM");
-    // const user = myUserJoin(socket.id, username);
-    const allUser = allUsers();
+    const allUser = getAllUsers();
     console.log(user,allUser)
     io.emit("allUserResponse",allUser);
   });
@@ -111,7 +132,7 @@ io.on("connection", (socket) => {
 
   socket.on("allUser",()=>{
     console.log('index: allUser');
-    var allUser = allUsers()
+    var allUser = getAllUsers()
     io.emit("allUserResponse",allUser);
   });
 
@@ -138,8 +159,7 @@ io.on("connection", (socket) => {
   socket.on("userJoin",({username})=>{
     console.log("userJoin",username)
     const user = userJoin(socket.id, username,"DM");
-    // const user = myUserJoin(socket.id, username);
-    const allUser = allUsers();
+    const allUser = getAllUsers();
     console.log(user,allUser)
     io.emit("allUserResponse",allUser);
   });
@@ -160,7 +180,7 @@ io.on("connection", (socket) => {
       users: getRoomUsers(user.room)
     });
 
-    var allUser = allUsers()
+    var allUser = getAllUsers()
     io.emit("allUserResponse",allUser);
 
       // .to(user.room)
@@ -181,7 +201,7 @@ io.on("connection", (socket) => {
         room: user.room,
         users: getRoomUsers(user.room)
       });
-      var allUser = allUsers()
+      var allUser = getAllUsers()
       io.emit("allUserResponse",allUser);
     }
 

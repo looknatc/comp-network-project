@@ -19,7 +19,7 @@
 	<body>
 		<div class="join-container">
 			<header class="join-header">
-				<h1><i class="fas fa-smile"></i> ChatCord</h1>
+				<h1><i class="fas fa-smile"></i> ChatCord</h1><h3 id="myUsername"></h3>
 			</header>
 			<main class="join-main">
 				<div class="index-sidebar">
@@ -28,18 +28,7 @@
 					<h3><i class="fas fa-users"></i>Online Users</h3>
 					<ul id="users"></ul>
 				</div>
-				<form action="chat.html">
-					<div class="form-control">
-						<label for="username">Username</label>
-						<input
-							type="text"
-							name="username"
-							id="username"
-							placeholder="Enter username..."
-							required
-						/>
-						<button type="button" id="submitUserName">Submit Username</button>
-					</div>
+				<form id="chat-form">
 					
 					<div class="form-control">
 						<label for="room">Room</label>
@@ -69,6 +58,8 @@
 // function Remove_options(){
 // 	$('#room').empty()
 // }
+var username = new URLSearchParams(window.location.search).get('username');
+
 function addUserToList(name) {
   // Create a new list item with the user's name and a DM button
   var listItem = $('<li>').append(
@@ -102,6 +93,7 @@ function outputAllUsers(users){
 $(function() {
     console.log( "ready!" );
 	const socket = io();
+	$("#myUsername").html(username);
 
 	$("#submitNameBtn").click(function(){
 		var roomName = $("#newRoomName").val()
@@ -139,26 +131,34 @@ $(function() {
 	socket.on("directMessage",(x)=>{
 		console.log("directMessage",x);
 	});
-	// var roomSelect = document.getElementById("room");
-	//   var x = ["ff","gg"]
-	//   for(r in rooms){
-	// 	var roomOption = document.createElement("option");
-	// 	// console.log(r)
-	// 	roomOption.text = x[r];
-	// 	roomOption.value = x[r];
-	// 	roomSelect.add(roomOption);
-	//   }
+	
 	socket.on('roomUsers', ({ room, users }) => {
 		outputRoomName(room);
 		outputUsers(users);
 	});
+
+
+
+	//when submit form go to chat in chosen room 
+	$("#chat-form").submit(function(event){
+		event.preventDefault(); // prevent the default form submission
+
+		const urlParams = new URLSearchParams(window.location.search);
+		const username = urlParams.get('username');
+		var selectedRoom = $("#room option:selected").val();
+		
+		window.location.href = '/chat.html?username=' + username + "&room=" + selectedRoom;
+		 
+	});
+
+
 });
-$(document).on('click', '.dm-btn', function() {
-  var name = $(this).prev().text();
-  var from = $("#username").val();
-  console.log(name);
-  window.location = '../dm.html?name=' + encodeURIComponent(name)+"&from="+encodeURIComponent(from);
-  
-});
+	$(document).on('click', '.dm-btn', function() {
+	var name = $(this).prev().text();
+	var from = username;
+	console.log(name);
+	window.location = '../dm.html?name=' + encodeURIComponent(name)+"&from="+encodeURIComponent(from);
+	
+	});
 
 </script>
