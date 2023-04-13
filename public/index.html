@@ -155,7 +155,7 @@ $(function() {
 });
 	$(document).on('click', '.dm-btn', function() {
 	var name = $(this).prev().text();
-	var from = $("#username").val();
+	var from = username;
 	console.log(name);
 	window.location = '../dm.html?name=' + encodeURIComponent(name)+"&from="+encodeURIComponent(from);
 	
