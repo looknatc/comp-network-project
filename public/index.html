@@ -19,7 +19,7 @@
 	<body>
 		<div class="join-container">
 			<header class="join-header">
-				<h1><i class="fas fa-smile"></i> ChatCord</h1>
+				<h1><i class="fas fa-smile"></i> ChatCord</h1><h3 id="myUsername"></h3>
 			</header>
 			<main class="join-main">
 				<div class="index-sidebar">
@@ -55,49 +55,53 @@
 </html>
 <script src="/socket.io/socket.io.js"></script>
 <script>
+// function Remove_options(){
+// 	$('#room').empty()
+// }
+var username = new URLSearchParams(window.location.search).get('username');
 
-	function addUserToList(name) {
-		// Create a new list item with the user's name and a DM button
-		var listItem = $('<li>').append(
-			$('<span>').text(name),
-			$('<button>').text('DM').addClass('dm-btn')
-		);
-		// Add the list item to the users list
-		$('#users').append(listItem);
+function addUserToList(name) {
+  // Create a new list item with the user's name and a DM button
+  var listItem = $('<li>').append(
+    $('<span>').text(name),
+    $('<button>').text('DM').addClass('dm-btn')
+  );
+  
+  // Add the list item to the users list
+  $('#users').append(listItem);
+}
+function outputRoomList(rooms){
+	$('#room').empty();
+	var roomSelect = document.getElementById("room");
+	for(r in rooms){
+		var roomOption = document.createElement("option");
+		// console.log(r)
+		roomOption.text = rooms[r];
+		roomOption.value = rooms[r];
+		roomSelect.add(roomOption);
+	}
+}
+function outputAllUsers(users){
+	$('#users').empty();
+	for( i in users){
+		// console.log(users[i],users[i].username)
+		addUserToList(users[i].username)
 	}
 
-	function outputRoomList(rooms){
-		console.log("outputRoomList");
-		$('#room').empty();
-		var roomSelect = document.getElementById("room");
-		for(r in rooms){
-			var roomOption = document.createElement("option");
-			// console.log(r)
-			roomOption.text = rooms[r];
-			roomOption.value = rooms[r];
-			roomSelect.add(roomOption);
-		}
-	}
-
-	function outputAllUsers(users){
-		$('#users').empty();
-		for( i in users){
-			// console.log(users[i],users[i].username)
-			addUserToList(users[i].username)
-		}
-
-	}
+}
 
 $(function() {
     console.log( "ready!" );
 	const socket = io();
+	$("#myUsername").html(username);
+
 	$("#submitNameBtn").click(function(){
 		var roomName = $("#newRoomName").val()
-		console.log(roomName)
+		// console.log(roomName)
 		if(roomName != ""){
 			socket.emit('newRoom', {roomName});
 		}
-
+		
 	});
 
 	$("#submitUserName").click(function(){
@@ -107,9 +111,16 @@ $(function() {
 
 	socket.emit("allUser",{});
 	socket.on("allUserResponse",(users) =>{
-		console.log("show users ",users);
+		console.log("allUserResponse",users);
 		outputAllUsers(users);
 	});
+	// socket.on("userJoin",(users) =>{
+	// 	console.log("userJoin",users);
+	// 	outputAllUsers(users);
+	// });
+
+	// socket.emit('NaoNao', {a:"b" });
+
 
 	socket.emit('roomList', {});
 	socket.on("roomListResponse",(rooms)=>{
