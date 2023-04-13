@@ -12,7 +12,8 @@ const formatMessage = require("./utils/messages");
 const dmStore = [
   {
     owner: "A_person1_B_person2",
-    messages:[]
+    messages:[],
+    time:0,
   }
 ];
 const {
@@ -32,6 +33,7 @@ const {
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
+const moment = require('moment');
 
 // // Set static folder
 app.use(express.static(path.join(__dirname, "public"), {index: "login.html"}));
@@ -57,6 +59,7 @@ function insertMessage(obj){
   // var to = obj.to;
   var from = obj.from;
   var msg = obj.msg;
+  var time = obj.time;
   // var owner = getOwner(to,from);
   var owner = obj.room;
   for(i in dmStore){
@@ -64,7 +67,8 @@ function insertMessage(obj){
     if(elem.owner == owner){
       elem.messages.push({
         content:msg,
-        from:from
+        from:from,
+        time:time
       })
       console.log(dmStore[i]);
       return
@@ -74,7 +78,8 @@ function insertMessage(obj){
     owner: owner,
     messages:[{
       content:msg,
-      from:from
+      from:from,
+      time:time
     }]
   })
   console.log(dmStore);
@@ -130,11 +135,13 @@ io.on("connection", (socket) => {
 
   socket.on("directMessage",({content,to,from})=>{
     console.log("receive message from",to,"content is",content);
+    var sendTime = moment().format('h:mm a');
     var owner = getOwner(to,from);
     insertMessage({
       room:owner,
       from:from,
-      msg:content
+      msg:content,
+      time:sendTime
     });
     toUser = findUser(to);
     console.log("toUser",toUser);
@@ -225,6 +232,7 @@ io.on("connection", (socket) => {
   // Listen for chatMessage
   socket.on("getPastMessages",(roomName)=>{
     console.log("getPastMessages",roomName.roomName);
+    console.log(roomName);
     var ret;
     for(i in dmStore){
       console.log("dmStore[i]",dmStore[i],dmStore[i].owner,roomName.roomName);
@@ -241,10 +249,12 @@ io.on("connection", (socket) => {
   socket.on("chatMessage", (msg) => {
     // console.log(msg);
     const user = getCurrentUser(socket.id);
+    var sendTime = moment().format('h:mm a');
     insertMessage({
       room:user.room,
       from:user.username,
-      msg:msg
+      msg:msg,
+      time: sendTime
     });
     io.to(user.room).emit("message",formatMessage(user.username, msg))
 
