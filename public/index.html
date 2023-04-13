@@ -85,7 +85,10 @@ function outputAllUsers(users){
 	$('#users').empty();
 	for( i in users){
 		// console.log(users[i],users[i].username)
-		addUserToList(users[i].username)
+		if(users[i].username != username){
+			addUserToList(users[i].username);
+		}
+		
 	}
 
 }

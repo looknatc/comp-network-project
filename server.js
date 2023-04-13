@@ -138,7 +138,8 @@ io.on("connection", (socket) => {
 
   socket.on("directMessage",({content,to,from})=>{
     console.log("receive message from",to,"content is",content);
-    var sendTime = moment().format('h:mm a');
+    // var sendTime = moment().format('h:mm a');
+    var sendTime = moment().format("YYYY-MM-DD H:mm a");
     var owner = getOwner(to,from);
     insertMessage({
       room:owner,
@@ -252,7 +253,8 @@ io.on("connection", (socket) => {
   socket.on("chatMessage", (msg) => {
     // console.log(msg);
     const user = getCurrentUser(socket.id);
-    var sendTime = moment().format('h:mm a');
+    // var sendTime = moment().format('h:mm a');
+    var sendTime =moment().format("YYYY-MM-DD H:mm a");
     insertMessage({
       room:user.room,
       from:user.username,
