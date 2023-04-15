@@ -25,7 +25,9 @@ const {
   userJoinSystem,
   getAllUserRoom,
   isUniqueUsername,
-  getAllUsers
+  getAllUsers,
+  allOnlineUsers,
+  users
 } = require("./utils/users");
 // var myModule = require("./utils/users");
 // var myUsers = myModule.myUsers;
@@ -84,6 +86,13 @@ function insertMessage(obj){
   })
   console.log(dmStore);
 }
+function showAllUserAndOnlineUser(){
+  var allUser = getAllUsers()
+  io.emit("allUserResponse",allUser);
+  var allOnlineUser = allOnlineUsers();
+  // console.log("allOnlineUserResponse",user)
+  io.emit("allOnlineUserResponse",allOnlineUser);
+}
 
 io.on("connection", (socket) => {
 
@@ -102,9 +111,13 @@ io.on("connection", (socket) => {
 
     if (unique) {
       // Add the username to the usernames array
+      userJoin(socket.id, username,"DM")
+      
       userJoinSystem(socket.id, username);
-      const allUser = getAllUsers();
-      io.emit("allUserResponse", allUser);
+      // const allUser = getAllUsers();
+      // io.emit("allUserResponse", allUser);
+      showAllUserAndOnlineUser()
+      
     } else{
       // console.log("usernameNotUnique");
       // socket.emit("usernameNotUnique",{msg:`your username is already used by ${username}, continue if you are ${username}.`});
@@ -132,13 +145,15 @@ io.on("connection", (socket) => {
 
   socket.on("allUser",()=>{
     console.log('index: allUser');
-    var allUser = getAllUsers()
-    io.emit("allUserResponse",allUser);
+    // var allUser = getAllUsers()
+    // io.emit("allUserResponse",allUser);
+    showAllUserAndOnlineUser()
   });
 
   socket.on("directMessage",({content,to,from})=>{
     console.log("receive message from",to,"content is",content);
-    var sendTime = moment().format('h:mm a');
+    // var sendTime = moment().format('h:mm a');
+    var sendTime = moment().format("YYYY-MM-DD H:mm a");
     var owner = getOwner(to,from);
     insertMessage({
       room:owner,
@@ -159,9 +174,11 @@ io.on("connection", (socket) => {
   socket.on("userJoin",({username})=>{
     console.log("userJoin",username)
     const user = userJoin(socket.id, username,"DM");
-    const allUser = getAllUsers();
-    console.log(user,allUser)
-    io.emit("allUserResponse",allUser);
+    // const allOnlineUser = allOnlineUsers();
+    // const allUser = getAllUsers();
+    // console.log(user,allUser)
+    // io.emit("allUserResponse",{allUser,allOnlineUser});
+    showAllUserAndOnlineUser()
   });
 
 
@@ -180,8 +197,10 @@ io.on("connection", (socket) => {
       users: getRoomUsers(user.room)
     });
 
-    var allUser = getAllUsers()
-    io.emit("allUserResponse",allUser);
+    // var allUser = getAllUsers()
+    // io.emit("allUserResponse",allUser);
+    showAllUserAndOnlineUser()
+    
 
       // .to(user.room)
       // .emit(
@@ -190,8 +209,9 @@ io.on("connection", (socket) => {
   });
   // Runs when client disconnects
   socket.on('disconnect',()=>{
+    console.log("disconnect called printusers",users)
     const user = userLeave(socket.id);
-    console.log("disconnect",user)
+    console.log("disconnec userLeave",user)
     if(user){
       io.to(user.room).emit(
         'message',
@@ -201,8 +221,13 @@ io.on("connection", (socket) => {
         room: user.room,
         users: getRoomUsers(user.room)
       });
-      var allUser = getAllUsers()
-      io.emit("allUserResponse",allUser);
+      // var allUser = getAllUsers()
+      // io.emit("allUserResponse",allUser);
+      // var allOnlineUser = allOnlineUsers();
+      // console.log("allOnlineUserResponse",user)
+      // io.emit("allOnlineUserResponse",allOnlineUser);
+      showAllUserAndOnlineUser()
+
     }
 
     
@@ -246,13 +271,14 @@ io.on("connection", (socket) => {
       }
     }
     // var ret= dmStore.filter(room => room.owner === roomName);
-    console.log("ret",ret);
+    console.log("getPastMessages",ret);
     socket.emit("getPastMessagesResponse",{ret});
   });
   socket.on("chatMessage", (msg) => {
     // console.log(msg);
     const user = getCurrentUser(socket.id);
-    var sendTime = moment().format('h:mm a');
+    // var sendTime = moment().format('h:mm a');
+    var sendTime =moment().format("YYYY-MM-DD H:mm a");
     insertMessage({
       room:user.room,
       from:user.username,

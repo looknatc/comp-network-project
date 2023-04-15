@@ -12,11 +12,18 @@ function getAllUsers(){
   return allUsers;
 }
 
+function allOnlineUsers(){
+  const uniqueUsers = Array.from(new Set(users.map(user => user.username))).map(username => {
+    return users.find(user => user.username === username);
+  });
+  return uniqueUsers
+}
+
 // user into chat room
 function userJoin(id, username, room) {
   const user = { id, username, room };
   users.push(user);
-  console.log(users);
+  console.log("userJoin",users);
 
   return user;
 }
@@ -76,6 +83,9 @@ module.exports = {
   findUser,
   userJoinSystem,
   getAllUserRoom,
-  isUniqueUsername
+  isUniqueUsername,
+  allOnlineUsers,
+  users
 };
 exports.allUsers = allUsers;
+// exports.users = users;

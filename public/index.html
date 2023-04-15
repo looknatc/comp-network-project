@@ -19,13 +19,16 @@
 	<body>
 		<div class="join-container">
 			<header class="join-header">
-				<h1><i class="fas fa-smile"></i> ChatCord</h1><h3 id="myUsername"></h3>
+				<h1><i class="fas fa-smile"></i> ChatCord</h1>
+				<div class="leave-container">
+				<h3 id="myUsername"></h3><button type="button" id="exit">exit</button>
+				</div>
 			</header>
 			<main class="join-main">
 				<div class="index-sidebar">
 					<!-- <h3><i class="fas fa-comments"></i> Room Name:</h3>
 					<h2 id="room-name"></h2> -->
-					<h3><i class="fas fa-users"></i>Online Users</h3>
+					<h3><i class="fas fa-users"></i>Users</h3>
 					<ul id="users"></ul>
 				</div>
 				<form id="chat-form">
@@ -62,7 +65,7 @@ var username = new URLSearchParams(window.location.search).get('username');
 
 function addUserToList(name) {
   // Create a new list item with the user's name and a DM button
-  var listItem = $('<li>').append(
+  var listItem = $(`<li id="${name}">`).append(
     $('<span>').text(name),
     $('<button>').text('DM').addClass('dm-btn')
   );
@@ -85,14 +88,35 @@ function outputAllUsers(users){
 	$('#users').empty();
 	for( i in users){
 		// console.log(users[i],users[i].username)
-		addUserToList(users[i].username)
+		if(users[i].username != username){
+			addUserToList(users[i].username);
+		}
+		
 	}
+
+}
+function showOnlineUsers(users){
+	console.log("showOnlineUsers",users)
+	// remvoe all clase first 
+	var li = $("#users > li")
+	for( i =0;i< li.length;i++){
+		$(li[i]).removeClass("online")
+	}
+	// add clas for online
+	for( i in users){
+		var user = users[i]
+		$(`#${user.username}`).addClass("online")
+	}
+	
 
 }
 
 $(function() {
     console.log( "ready!" );
 	const socket = io();
+
+	// re join room because change of page will auto disconnect 
+	socket.emit('userJoin', {username});
 	$("#myUsername").html(username);
 
 	$("#submitNameBtn").click(function(){
@@ -101,6 +125,17 @@ $(function() {
 		if(roomName != ""){
 			socket.emit('newRoom', {roomName});
 		}
+		
+	});
+
+	$("#exit").click(function(){
+		const leaveRoom = confirm('Are you sure you want to exit');
+		if (leaveRoom) {
+			// window.location = '../index.html';
+			window.location.href = '/login.html';
+			socket.disconnect();
+		} else {
+  }
 		
 	});
 
@@ -135,6 +170,14 @@ $(function() {
 	socket.on('roomUsers', ({ room, users }) => {
 		outputRoomName(room);
 		outputUsers(users);
+	});
+
+	socket.on('allOnlineUserResponse', (users ) => {
+		// outputRoomName(room);
+		// outputUsers(users);
+		showOnlineUsers(users)
+		console.log("allOnlineUserResponse",users);
+
 	});
 
 
