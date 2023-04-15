@@ -28,7 +28,7 @@
 				<div class="index-sidebar">
 					<!-- <h3><i class="fas fa-comments"></i> Room Name:</h3>
 					<h2 id="room-name"></h2> -->
-					<h3><i class="fas fa-users"></i>Online Users</h3>
+					<h3><i class="fas fa-users"></i>Users</h3>
 					<ul id="users"></ul>
 				</div>
 				<form id="chat-form">
@@ -65,7 +65,7 @@ var username = new URLSearchParams(window.location.search).get('username');
 
 function addUserToList(name) {
   // Create a new list item with the user's name and a DM button
-  var listItem = $('<li>').append(
+  var listItem = $(`<li id="${name}">`).append(
     $('<span>').text(name),
     $('<button>').text('DM').addClass('dm-btn')
   );
@@ -95,10 +95,28 @@ function outputAllUsers(users){
 	}
 
 }
+function showOnlineUsers(users){
+	console.log("showOnlineUsers",users)
+	// remvoe all clase first 
+	var li = $("#users > li")
+	for( i =0;i< li.length;i++){
+		$(li[i]).removeClass("online")
+	}
+	// add clas for online
+	for( i in users){
+		var user = users[i]
+		$(`#${user.username}`).addClass("online")
+	}
+	
+
+}
 
 $(function() {
     console.log( "ready!" );
 	const socket = io();
+
+	// re join room because change of page will auto disconnect 
+	socket.emit('userJoin', {username});
 	$("#myUsername").html(username);
 
 	$("#submitNameBtn").click(function(){
@@ -115,6 +133,7 @@ $(function() {
 		if (leaveRoom) {
 			// window.location = '../index.html';
 			window.location.href = '/login.html';
+			socket.disconnect();
 		} else {
   }
 		
@@ -151,6 +170,14 @@ $(function() {
 	socket.on('roomUsers', ({ room, users }) => {
 		outputRoomName(room);
 		outputUsers(users);
+	});
+
+	socket.on('allOnlineUserResponse', (users ) => {
+		// outputRoomName(room);
+		// outputUsers(users);
+		showOnlineUsers(users)
+		console.log("allOnlineUserResponse",users);
+
 	});
 
 

@@ -277,6 +277,10 @@ a {
 
 }
 
+#users > li.online {
+    color: green;
+}
+
 @media (max-width: 700px) {
 	.chat-main {
 		display: block;
