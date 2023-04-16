@@ -9,13 +9,24 @@ const formatMessage = require("./utils/messages");
 // const { createClient } = redis;
 
 // {A_person1_B_person2:[] }
-const dmStore = [
+const messageStorage = [
   {
     owner: "A_person1_B_person2",
     messages:[],
     time:0,
+    unRead:0
   }
 ];
+const readStatus = [
+  {
+    username:"xxxx",
+    rooms:[{
+      sender:"A?person1?B?person2",
+      status:0,
+    }
+    ]
+  }
+]
 const {
   userJoin,
   getCurrentUser,
@@ -27,7 +38,8 @@ const {
   isUniqueUsername,
   getAllUsers,
   allOnlineUsers,
-  users
+  users,
+  getRoom
 } = require("./utils/users");
 // var myModule = require("./utils/users");
 // var myUsers = myModule.myUsers;
@@ -50,6 +62,33 @@ const botName = "ChatCord Bot";
 
 const roomList = ["roomA","roomB"]
 // // Run when client connects
+function updateRead(username,sender,status){
+  console.log("server: update read: (username,sender,status)",username,sender,status)
+  const user = readStatus.find(user => user.username === username);
+  if (user) {
+    const room = user.rooms.find(room => room.sender === sender);
+    if (room) {
+       room.status = status
+      // console.log(room);
+    } else {
+
+      var newroom = { sender, status };
+      user.rooms.push(newroom);
+      // console.log("Room not found for sender 'y'");
+    }
+  } else {
+    var newuser = { username, rooms: [{ sender, status }] };
+    readStatus.push(newuser);
+    // console.log("User not found for username 'xxxx'");
+  }
+
+  // for(i in readStatus){
+  //   elem = readStatus[i];
+  //   if(elem.username == username){
+  //     const roomWithSenderY = rooms.find(room => room.sender === "y");
+  //   }
+  // }
+}
 function getOwner(a,b){
   if(a<b){
     return "A?"+a+"?B?"+b;
@@ -64,34 +103,35 @@ function insertMessage(obj){
   var time = obj.time;
   // var owner = getOwner(to,from);
   var owner = obj.room;
-  for(i in dmStore){
-    elem = dmStore[i];
+  for(i in messageStorage){
+    elem = messageStorage[i];
     if(elem.owner == owner){
       elem.messages.push({
         content:msg,
         from:from,
         time:time
       })
-      console.log(dmStore[i]);
+      console.log("server: insertMessage",messageStorage[i]);
       return
     }
   }
-  dmStore.push({
+  messageStorage.push({
     owner: owner,
     messages:[{
       content:msg,
       from:from,
-      time:time
-    }]
+      time:time,
+    }],
+    
   })
-  console.log(dmStore);
+  console.log("server: insertMessage (new owner)",messageStorage);
 }
 function showAllUserAndOnlineUser(){
   var allUser = getAllUsers()
   io.emit("allUserResponse",allUser);
   var allOnlineUser = allOnlineUsers();
   // console.log("allOnlineUserResponse",user)
-  io.emit("allOnlineUserResponse",allOnlineUser);
+  io.emit("allOnlineUserResponse",{allOnlineUser});
 }
 
 io.on("connection", (socket) => {
@@ -124,14 +164,24 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("readStatus",({username})=>{
+    console.log('server: readStatus',readStatus)
+    var result = readStatus.find(user => user.username === username)
+    if(result){
+      socket.emit("readStatus",result);
+    }
+    
 
-  socket.on("startDM",({from})=>{
-    console.log("allUser",getAllUsers());
-    const user = userJoin(socket.id, from,"DM");
-    const allUser = getAllUsers();
-    console.log(user,allUser)
-    io.emit("allUserResponse",allUser);
   });
+
+
+  // socket.on("startDM",({from})=>{
+  //   console.log("allUser",getAllUsers());
+  //   const user = userJoin(socket.id, from,"DM");
+  //   const allUser = getAllUsers();
+  //   console.log(user,allUser)
+  //   io.emit("allUserResponse",allUser);
+  // });
 
   socket.on("roomList",()=>{
     console.log('get roomList');
@@ -151,7 +201,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("directMessage",({content,to,from})=>{
-    console.log("receive message from",to,"content is",content);
+    console.log("server: directMessage: receive message from",to,"content is",content);
     // var sendTime = moment().format('h:mm a');
     var sendTime = moment().format("YYYY-MM-DD H:mm a");
     var owner = getOwner(to,from);
@@ -172,7 +222,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("userJoin",({username})=>{
-    console.log("userJoin",username)
+    console.log("server: userJoin: ",username)
     const user = userJoin(socket.id, username,"DM");
     // const allOnlineUser = allOnlineUsers();
     // const allUser = getAllUsers();
@@ -186,7 +236,8 @@ io.on("connection", (socket) => {
     const user = userJoin(socket.id, username, room);
 
     socket.join(user.room);
-
+    console.log("server joinRoom updateRead",user.username,user.room,0)
+    updateRead(user.username,user.room,0)//status read
     socket.emit("message", formatMessage(botName, "Welcome to ChatCord!"));
     
     // Broadcast when a user connects
@@ -258,22 +309,25 @@ io.on("connection", (socket) => {
 //   });
 
   // Listen for chatMessage
-  socket.on("getPastMessages",(roomName)=>{
-    console.log("getPastMessages",roomName.roomName);
-    console.log(roomName);
+  socket.on("getPastMessages",({roomName})=>{
+    console.log("server: getPastMessages",roomName);
+    // console.log(roomName);
     var ret;
-    for(i in dmStore){
-      console.log("dmStore[i]",dmStore[i],dmStore[i].owner,roomName.roomName);
-      if(dmStore[i].owner === roomName.roomName){
+    for(i in messageStorage){
+      console.log("messageStorage[i]",messageStorage[i],messageStorage[i].owner,roomName);
+      if(messageStorage[i].owner === roomName){
+        
+        ret = messageStorage[i].messages;
         console.log("find ret",ret);
-        ret = dmStore[i].messages;
         break;
+        
       }
     }
-    // var ret= dmStore.filter(room => room.owner === roomName);
+    // var ret= messageStorage.filter(room => room.owner === roomName);
     console.log("getPastMessages",ret);
     socket.emit("getPastMessagesResponse",{ret});
   });
+
   socket.on("chatMessage", (msg) => {
     // console.log(msg);
     const user = getCurrentUser(socket.id);
@@ -285,7 +339,39 @@ io.on("connection", (socket) => {
       msg:msg,
       time: sendTime
     });
+    // nat
+    console.log("chatMessage user.room",user.room)
+    //also alert to index.html if user not join room
+    if (/^([^?]+\?){3}[^?]+$/.test(user.room)) {
+      const arr = user.room.split("?");
+      console.log("server: room name split" ,arr); // ["xxx", "yyyyy", "xxxxx", "yyyyyy"]
+      var toUser = arr[1]
+      if(user.username == arr[1]){
+        toUser = arr[3]
+      }
+      room = getRoom(toUser)
+      if(room){
+        console.log("getRoom(toUser)",room)
+        if(room.room == "DM"){
+          updateRead(toUser,user.room,1)//status 1 = has unread
+          io.to(room.id).emit("alertDM",formatMessage(user.username, msg))
+        }
+      }
+      else{
+        updateRead(toUser,user.room,1)
+      }
+      
+      // else{
+      //   // io.to(user.room).emit("message",formatMessage(user.username, msg))
+      // }
+    }
+    // } else {
+    //   //send to rooms
+    //   io.to(user.room).emit("message",formatMessage(user.username, msg))
+    // }
+    
     io.to(user.room).emit("message",formatMessage(user.username, msg))
+
 
   });
 

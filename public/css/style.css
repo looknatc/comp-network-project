@@ -248,7 +248,7 @@ a {
 	padding: 5px 0;
 }
 
-.dm-btn {
+/* .dm-btn {
 	background-color: #007bff;
 	color: #fff;
 	border: none;
@@ -256,10 +256,41 @@ a {
 	padding: 5px 10px;
 	margin-left: 10px;
 	cursor: pointer;
+} */
+.dm-btn {
+    /* background-color: #007bff; */
+    color: #fff;
+    /* border: none; */
+    /* border-radius: 3px; */
+    padding: -6px 10px;
+    margin-left: 5px;
+    cursor: pointer;
+    font-size: unset;
 }
 
 .dm-btn:hover {
-	background-color: #0062cc;
+    background-color: #777;
+}
+
+#submitNameBtn:hover {
+	background-color: #777;
+}
+#submitNameBtn {
+	color: #fff;
+    /* border: none; */
+    /* border-radius: 3px; */
+    cursor: pointer;
+    /* font-size: unset; */
+	display: inline-block;
+}
+
+#exit{
+	color: #fff;
+    cursor: pointer;
+
+}
+#exit:hover {
+	background-color: #777;
 }
 
 .username {
@@ -280,6 +311,36 @@ a {
 #users > li.online {
     color: green;
 }
+
+#users .dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background-color: rgba(128, 0, 0, 0.772);
+	/* display: inline-block; */
+    margin-right: 4px;
+	display: none; /* hide the dot by default */
+}
+
+#users .unRead div.dot {
+	display: inline-block; /* show the dot when the element has the "unread" class */
+}
+
+#users > li {
+    color: dimgrey;
+    font-weight: 800;
+}
+
+/* icon */
+
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 48
+}
+
 
 @media (max-width: 700px) {
 	.chat-main {
