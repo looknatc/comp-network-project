@@ -14,6 +14,7 @@ const dmStore = [
     owner: "A_person1_B_person2",
     messages:[],
     time:0,
+    unRead:0
   }
 ];
 const {
@@ -27,7 +28,8 @@ const {
   isUniqueUsername,
   getAllUsers,
   allOnlineUsers,
-  users
+  users,
+  getRoom
 } = require("./utils/users");
 // var myModule = require("./utils/users");
 // var myUsers = myModule.myUsers;
@@ -72,7 +74,7 @@ function insertMessage(obj){
         from:from,
         time:time
       })
-      console.log(dmStore[i]);
+      console.log("server: insertMessage",dmStore[i]);
       return
     }
   }
@@ -81,10 +83,11 @@ function insertMessage(obj){
     messages:[{
       content:msg,
       from:from,
-      time:time
-    }]
+      time:time,
+    }],
+    
   })
-  console.log(dmStore);
+  console.log("server: insertMessage (new owner)",dmStore);
 }
 function showAllUserAndOnlineUser(){
   var allUser = getAllUsers()
@@ -125,13 +128,13 @@ io.on("connection", (socket) => {
   });
 
 
-  socket.on("startDM",({from})=>{
-    console.log("allUser",getAllUsers());
-    const user = userJoin(socket.id, from,"DM");
-    const allUser = getAllUsers();
-    console.log(user,allUser)
-    io.emit("allUserResponse",allUser);
-  });
+  // socket.on("startDM",({from})=>{
+  //   console.log("allUser",getAllUsers());
+  //   const user = userJoin(socket.id, from,"DM");
+  //   const allUser = getAllUsers();
+  //   console.log(user,allUser)
+  //   io.emit("allUserResponse",allUser);
+  // });
 
   socket.on("roomList",()=>{
     console.log('get roomList');
@@ -151,7 +154,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("directMessage",({content,to,from})=>{
-    console.log("receive message from",to,"content is",content);
+    console.log("server: directMessage: receive message from",to,"content is",content);
     // var sendTime = moment().format('h:mm a');
     var sendTime = moment().format("YYYY-MM-DD H:mm a");
     var owner = getOwner(to,from);
@@ -172,7 +175,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("userJoin",({username})=>{
-    console.log("userJoin",username)
+    console.log("server: userJoin: ",username)
     const user = userJoin(socket.id, username,"DM");
     // const allOnlineUser = allOnlineUsers();
     // const allUser = getAllUsers();
@@ -258,22 +261,25 @@ io.on("connection", (socket) => {
 //   });
 
   // Listen for chatMessage
-  socket.on("getPastMessages",(roomName)=>{
-    console.log("getPastMessages",roomName.roomName);
-    console.log(roomName);
+  socket.on("getPastMessages",({roomName})=>{
+    console.log("server: getPastMessages",roomName);
+    // console.log(roomName);
     var ret;
     for(i in dmStore){
-      console.log("dmStore[i]",dmStore[i],dmStore[i].owner,roomName.roomName);
-      if(dmStore[i].owner === roomName.roomName){
-        console.log("find ret",ret);
+      console.log("dmStore[i]",dmStore[i],dmStore[i].owner,roomName);
+      if(dmStore[i].owner === roomName){
+        
         ret = dmStore[i].messages;
+        console.log("find ret",ret);
         break;
+        
       }
     }
     // var ret= dmStore.filter(room => room.owner === roomName);
     console.log("getPastMessages",ret);
     socket.emit("getPastMessagesResponse",{ret});
   });
+
   socket.on("chatMessage", (msg) => {
     // console.log(msg);
     const user = getCurrentUser(socket.id);
@@ -285,7 +291,32 @@ io.on("connection", (socket) => {
       msg:msg,
       time: sendTime
     });
+    // nat
+    console.log("chatMessage user.room",user.room)
+    //also alert to index if user not join room
+    if (/^([^?]+\?){3}[^?]+$/.test(user.room)) {
+      const arr = user.room.split("?");
+      console.log("server: room name split" ,arr); // ["xxx", "yyyyy", "xxxxx", "yyyyyy"]
+      var toUser = arr[1]
+      if(user.username == arr[1]){
+        toUser = arr[3]
+      }
+      room = getRoom(toUser)
+      console.log("getRoom(toUser)",room,room.id)
+      if(room.room == "DM"){
+        io.to(room.id).emit("alertDM",formatMessage(user.username, msg))
+      }
+      // else{
+      //   // io.to(user.room).emit("message",formatMessage(user.username, msg))
+      // }
+    }
+    // } else {
+    //   //send to rooms
+    //   io.to(user.room).emit("message",formatMessage(user.username, msg))
+    // }
+    
     io.to(user.room).emit("message",formatMessage(user.username, msg))
+
 
   });
 

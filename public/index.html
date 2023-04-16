@@ -62,13 +62,27 @@
 // 	$('#room').empty()
 // }
 var username = new URLSearchParams(window.location.search).get('username');
+// var hasUnread = [];
+var hasUnread = new Set();
 
 function addUserToList(name) {
   // Create a new list item with the user's name and a DM button
-  var listItem = $(`<li id="${name}">`).append(
+	console.log("hasUnread",hasUnread);
+  if(hasUnread.has(name)){
+	var listItem = $(`<li id="${name}" class="unRead">`).append(
+	$('<div class="dot">'),
     $('<span>').text(name),
     $('<button>').text('DM').addClass('dm-btn')
   );
+
+  }else{
+	var listItem = $(`<li id="${name}">`).append(
+	$('<div class="dot">'),
+    $('<span>').text(name),
+    $('<button>').text('DM').addClass('dm-btn')
+  );
+  }
+  
   
   // Add the list item to the users list
   $('#users').append(listItem);
@@ -107,8 +121,27 @@ function showOnlineUsers(users){
 		var user = users[i]
 		$(`#${user.username}`).addClass("online")
 	}
-	
 
+	//sort by online 
+	var items = $("#users > li").get();
+	items.sort((a, b) => {
+	const aTop = $(a).hasClass('online');
+	const bTop = $(b).hasClass('online');
+	
+	if (aTop && !bTop) {
+		return -1;
+	} else if (!aTop && bTop) {
+		return 1;
+	} else {
+		return 0;
+	}
+	});
+	$('#users').empty();
+	$(items).appendTo('#users');
+
+}
+function showAlertDM(message){
+	$(`#${message.from}`).addClass("unRead")
 }
 
 $(function() {
@@ -179,6 +212,19 @@ $(function() {
 		console.log("allOnlineUserResponse",users);
 
 	});
+	socket.on('alertDM', (message) => {
+        console.log("index.html message",message,message.from);
+		showAlertDM(message);
+		// hasUnread.push(message.from)
+		hasUnread.add(message.from)
+		console.log("hasUnread",hasUnread)
+        // outputMessage2(message);
+
+        // // Scroll down
+        // chatMessages.scrollTop = chatMessages.scrollHeight;
+    });
+
+
 
 
 
@@ -198,6 +244,8 @@ $(function() {
 });
 	$(document).on('click', '.dm-btn', function() {
 	var name = $(this).prev().text();
+	// hasUnread = hasUnread.filter(n => n !==name)
+	hasUnread.delete(name);
 	var from = username;
 	console.log(name);
 	window.location = '../dm.html?name=' + encodeURIComponent(name)+"&from="+encodeURIComponent(from);

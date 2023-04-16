@@ -281,6 +281,20 @@ a {
     color: green;
 }
 
+#users .dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background-color: rgba(128, 0, 0, 0.772);
+	/* display: inline-block; */
+    margin-right: 4px;
+	display: none; /* hide the dot by default */
+}
+
+#users .unRead div.dot {
+	display: block; /* show the dot when the element has the "unread" class */
+}
+
 @media (max-width: 700px) {
 	.chat-main {
 		display: block;

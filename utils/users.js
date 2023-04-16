@@ -6,7 +6,9 @@ var allUsers= [];
 function getAllUserRoom(targetRoom){
   return users.filter((user) => user.room === targetRoom);
 }
-
+function getRoom(username){
+  return users.find((user) => user.username === username);
+}
 //return user in system
 function getAllUsers(){
   return allUsers;
@@ -41,6 +43,7 @@ function userJoinSystem(id, username) {
 function findUser(username){
   for(i in users){
     if(users[i].username == username){
+      console.log("findUser found:", users[i])
       return users[i];
     }
   }
@@ -85,7 +88,8 @@ module.exports = {
   getAllUserRoom,
   isUniqueUsername,
   allOnlineUsers,
-  users
+  users,
+  getRoom
 };
 exports.allUsers = allUsers;
 // exports.users = users;
