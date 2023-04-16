@@ -10,6 +10,8 @@
 			integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk="
 			crossorigin="anonymous"
 		/>
+		
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 		<link rel="stylesheet" href="css/style.css" />
 		<title>ChatCord App</title>
 		<script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
@@ -21,7 +23,8 @@
 			<header class="join-header">
 				<h1><i class="fas fa-smile"></i> ChatCord</h1>
 				<div class="leave-container">
-				<h3 id="myUsername"></h3><button type="button" id="exit">exit</button>
+				<!-- <h3 id="myUsername"></h3><button type="button" id="exit">exit</button> -->
+				<h3 id="myUsername"></h3><span class="material-symbols-outlined" id="exit">logout</span>
 				</div>
 			</header>
 			<main class="join-main">
@@ -47,7 +50,10 @@
 							id="newRoomName"
 							placeholder="Enter Room Name..."
 						/>
-						<button type="button" id="submitNameBtn">New Room</button>
+						<span class="material-symbols-outlined" id="submitNameBtn">
+							add_circle
+							</span>
+						<!-- <button type="button" id="submitNameBtn">New Room</button> -->
 					</div>
 					<button type="submit" class="btn">Join Chat</button>
 				</form>
@@ -68,24 +74,36 @@ var hasUnread = new Set();
 function addUserToList(name) {
   // Create a new list item with the user's name and a DM button
 	console.log("hasUnread",hasUnread);
-  if(hasUnread.has(name)){
-	var listItem = $(`<li id="${name}" class="unRead">`).append(
+	var liStr = `<li id="${name}">`
+	if(hasUnread.has(name)){
+		liStr = `<li id="${name}" class="unRead">`
+	}
+	var listItem = $(liStr).append(
 	$('<div class="dot">'),
     $('<span>').text(name),
-    $('<button>').text('DM').addClass('dm-btn')
-  );
+	$('<span>').text("chat").addClass("material-symbols-outlined dm-btn")
+	)
+	$('#users').append(listItem);
+//   if(hasUnread.has(name)){
+// 	var listItem = $(`<li id="${name}" class="unRead">`).append(
+// 	$('<div class="dot">'),
+//     $('<span>').text(name),
+// 	$('<span>').text("chat").addClass("material-symbols-outlined dm-btn")
+//     // $('<button>').text('DM').addClass('dm-btn')
+//   );
 
-  }else{
-	var listItem = $(`<li id="${name}">`).append(
-	$('<div class="dot">'),
-    $('<span>').text(name),
-    $('<button>').text('DM').addClass('dm-btn')
-  );
-  }
+//   }else{
+// 	var listItem = $(`<li id="${name}">`).append(
+// 	$('<div class="dot">'),
+//     $('<span>').text(name),
+// 	$('<span>').text("chat").addClass("material-symbols-outlined dm-btn")
+//     // $('<button>').text('DM').addClass('dm-btn')
+//   );
+//   }
   
   
-  // Add the list item to the users list
-  $('#users').append(listItem);
+//   // Add the list item to the users list
+//   $('#users').append(listItem);
 }
 function outputRoomList(rooms){
 	$('#room').empty();
@@ -144,12 +162,32 @@ function showAlertDM(message){
 	$(`#${message.from}`).addClass("unRead")
 }
 
+function showUnread(result){
+	var user = result.username
+	var rooms = result.rooms
+	for(i in rooms){
+		var room = rooms[i];
+		if ((room.status ==1) &&/^([^?]+\?){3}[^?]+$/.test(room.sender)) {
+			const arr = (room.sender).split("?");
+			console.log("server: room name split" ,arr); // ["xxx", "yyyyy", "xxxxx", "yyyyyy"]
+			var sender = arr[1]
+			if(user == arr[1]){
+				sender = arr[3]
+			}
+			$(`#${sender}`).addClass("unRead")
+			hasUnread.add(sender)
+		}
+	}
+
+}
+
 $(function() {
     console.log( "ready!" );
 	const socket = io();
 
 	// re join room because change of page will auto disconnect 
 	socket.emit('userJoin', {username});
+	
 	$("#myUsername").html(username);
 
 	$("#submitNameBtn").click(function(){
@@ -158,6 +196,7 @@ $(function() {
 		if(roomName != ""){
 			socket.emit('newRoom', {roomName});
 		}
+		$("#newRoomName").val("");
 		
 	});
 
@@ -205,12 +244,18 @@ $(function() {
 		outputUsers(users);
 	});
 
-	socket.on('allOnlineUserResponse', (users ) => {
+	socket.on('allOnlineUserResponse', ({allOnlineUser,readStatus}) => {
 		// outputRoomName(room);
 		// outputUsers(users);
-		showOnlineUsers(users)
-		console.log("allOnlineUserResponse",users);
+		showOnlineUsers(allOnlineUser)
+		console.log("allOnlineUserResponse",allOnlineUser);
+		// showUnread
 
+	});
+	socket.emit("readStatus",{username});
+	socket.on("readStatus",(result)=>{
+		console.log("index.html readStatus",result)
+		showUnread(result)
 	});
 	socket.on('alertDM', (message) => {
         console.log("index.html message",message,message.from);
