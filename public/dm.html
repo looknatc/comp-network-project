@@ -10,14 +10,14 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="css/style.css" />
-    <title>ChatCord App</title>
+    <title>Chatshire App</title>
     <script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
 		<!-- <script src=”https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js”></script> -->
   </head>
   <body>
     <div class="chat-container">
       <header class="chat-header">
-        <h1><i class="fas fa-smile"></i> ChatCord</h1>
+        <h1><i class="fas fa-cat"></i> Chatshire</h1>
         <div class = "leave-container"><h3 id="me"></h3><a id="leave-btn" class="btn">Leave DM</a></div>
         
       </header>
@@ -80,19 +80,26 @@ console.log(name,from);
 
 //   document.querySelector('.chat-messages').appendChild(div);
 // }
+function outputDate(date){
+  const div = document.createElement("div");
+  div.classList.add("chat-date");
+  div.innerHTML = `<p class="meta">${date}</p> `;
+  document.querySelector(".chat-messages").appendChild(div);
+}
 function outputMessage2(message) {
 //   console.log("hey this id tontong2",message)
   const div = document.createElement('div');
+  const time = message.time.split(' ')
   if (message.from === from){
     // console.log("from sender");
     div.classList.add('message-sender');
-  div.innerHTML = `<p class="meta">${message.from} <span>${message.time}</span></p> 
+  div.innerHTML = `<p class="meta">${message.from} <span>${time[1] + ' ' + time[2]}</span></p> 
   <p class="text">
     ${message.content}
   </p>`;}else{
     // console.log("from receiver");
     div.classList.add('message-receiver');
-  div.innerHTML = `<p class="meta">${message.from} <span>${message.time}</span></p> 
+  div.innerHTML = `<p class="meta">${message.from} <span>${time[1] + ' ' + time[2]}</span></p> 
   <p class="text">
     ${message.content}
   </p>`;
@@ -121,15 +128,26 @@ $(function(){
     })
 
     socket.emit("getPastMessages",{roomName});
+    let prevdate = "";
     socket.on("getPastMessagesResponse",(response)=>{
         console.log("dm.html getPastMessagesResponse: ",response);
         for(i in response.ret){
+          const newdate = response.ret[i].time.split(" ");
+          if (prevdate !== newdate[0]) {
+            prevdate = newdate[0];
+            outputDate(newdate[0])
+          }
             outputMessage2(response.ret[i]);
         }
         chatMessages.scrollTop = chatMessages.scrollHeight;
     });
     socket.on('message', (message) => {
         console.log("dm.html message",message);
+        const newdate = message.time.split(" ");
+        if (prevdate !== newdate[0]){
+          prevdate = newdate[0];
+          outputDate(newdate[0])
+        }
         outputMessage2(message);
 
         // Scroll down

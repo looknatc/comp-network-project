@@ -5,12 +5,12 @@
 }
 
 :root {
-	--dark-color-a: #0C8496;
-	--dark-color-b: #DDA033;
-	--light-color: #E0D8C3;
-	--light-color-a: #E0D8C9;
-	--light-color-b: #C2E4E7;
-	--success-color: #065125;
+	--dark-color-a: #31393C;
+	--dark-color-b: #3E96F4;
+	--light-color: #EDEEEB;
+	--light-color-a: #CCC7BF;
+	--light-color-b: #FFDD94;
+	--success-color: #d9f744;
 	--error-color: #E2532F;
 }
 
@@ -178,7 +178,22 @@ a {
 	flex: 1;
 	border-radius: 6px;
 }
-
+.chat-messages .chat-date {
+	text-align: center;
+	border-radius: 20px 20px 20px 20px;
+	margin-left:42%;
+	max-width: 75px;
+	padding: 2px;
+	margin-top: 5px;
+	margin-bottom: 20px;
+	background-color: var(--error-color);
+}
+.chat-messages .chat-date .meta {
+	font-size: 12px;
+	font-weight: bold;
+	color: white;
+	opacity: 0.7;
+}
 
 /* Join Page */
 .join-container {
@@ -309,14 +324,16 @@ a {
 }
 
 #users > li.online {
-    color: green;
+    color: rgb(240, 242, 133);
+	margin-left: 10px;
+	
 }
 
 #users .dot {
 	width: 10px;
 	height: 10px;
 	border-radius: 50%;
-	background-color: rgba(128, 0, 0, 0.772);
+	background-color: rgba(220, 25, 25, 0.772);
 	/* display: inline-block; */
     margin-right: 4px;
 	display: none; /* hide the dot by default */
@@ -327,7 +344,7 @@ a {
 }
 
 #users > li {
-    color: dimgrey;
+    color: var(--light-color-b);
     font-weight: 800;
 }
 
