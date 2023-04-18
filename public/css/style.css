@@ -341,10 +341,13 @@ a {
 }
 
 #users > li.online {
+	display: block;
     color: var(--success-color);
 	margin-left: 10px;
+	text-decoration: none;
 	
 }
+
 
 #users .dot {
 	width: 10px;
@@ -361,10 +364,13 @@ a {
 }
 
 #users > li {
+	display: block;
     color: var(--light-color-a);
     font-weight: 800;
 	margin-left: 10px;
+	text-decoration: none;
 }
+
 
 /* icon */
 
@@ -381,6 +387,11 @@ a {
 	.chat-main {
 		display: block;
 	}
+
+	.dm-main {
+		display: block;
+	}
+	
 
 	.chat-sidebar {
 		display: none;
