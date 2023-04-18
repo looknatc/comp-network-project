@@ -61,7 +61,14 @@ socket.on("message", (message) => {
     prevdate = newdate[0];
     outputDate(newdate[0]);
   }
-  outputMessage(message);
+  if (message.from === "Chatshire Bot") {
+    const div = document.createElement("div");
+    div.classList.add("chatbot-message");
+    div.innerHTML = `<p class="meta">${message.content}</p>`;
+    document.querySelector(".chat-messages").appendChild(div);
+  } else {
+    outputMessage(message);
+  }
 
   // Scroll down
   chatMessages.scrollTop = chatMessages.scrollHeight;

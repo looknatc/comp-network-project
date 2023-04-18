@@ -181,7 +181,7 @@ a {
 .chat-messages .chat-date {
 	text-align: center;
 	border-radius: 20px 20px 20px 20px;
-	margin-left:42%;
+	margin-left:46%;
 	max-width: 75px;
 	padding: 2px;
 	margin-top: 5px;
@@ -189,10 +189,27 @@ a {
 	background-color: var(--error-color);
 }
 .chat-messages .chat-date .meta {
-	font-size: 12px;
+	font-size: 11px;
 	font-weight: bold;
 	color: white;
 	opacity: 0.7;
+}
+
+.chat-messages .chatbot-message {
+	text-align : center;
+	border-radius: 20px 20px 20px 20px;
+	margin-top: 5px;
+	margin-bottom: 20px;
+	padding: 1px;
+	background-color:rgba(12, 12, 12, 0.111) ;
+	opacity: 0.6;
+
+}
+.chat-messages .chatbot-message .meta {
+	font-size : 12px;
+	font-weight : bold;
+	font-style : italic;
+	color : #31393C;
 }
 
 /* Join Page */
