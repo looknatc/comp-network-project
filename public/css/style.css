@@ -341,7 +341,7 @@ a {
 }
 
 #users > li.online {
-    color: rgb(240, 242, 133);
+    color: var(--success-color);
 	margin-left: 10px;
 	
 }
@@ -361,8 +361,9 @@ a {
 }
 
 #users > li {
-    color: var(--light-color-b);
+    color: var(--light-color-a);
     font-weight: 800;
+	margin-left: 10px;
 }
 
 /* icon */
