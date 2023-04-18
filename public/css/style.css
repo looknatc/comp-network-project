@@ -384,33 +384,43 @@ a {
 	.chat-sidebar {
 		display: none;
 	}
+	
+	.chat-messages{
+		display:inline-block;
+		vertical-align: top;
+		padding: 2%;
+		max-height: 500px;
+		width : 100%;
+		overflow-y: scroll;
+	}
 }
 
 
 @media screen and (max-width: 768px) {
 	.chat-messages .message-receiver {
-	  margin-right: 100px;
+	  margin-right: 65%;
 	  border-radius: 20px;
 	}
+
   }
   
   @media screen and (max-width: 576px) {
 	.chat-messages .message-receiver {
-	  margin-right: 0;
+	  margin-right: 65%;
 	  border-radius: 20px;
 	}
   }
 
   @media screen and (max-width: 768px) {
 	.chat-messages .message-sender {
-	  margin-left: 100px;
+	  margin-left: 65%;
 	  border-radius: 20px;
 	}
   }
   
   @media screen and (max-width: 576px) {
 	.chat-messages .message-sender {
-	  margin-left: 0;
+	  margin-left: 65%;
 	  border-radius: 20px;
 	}
   }
