@@ -15,7 +15,7 @@ const { username, room } = Qs.parse(location.search, {
 // function outputMessage2(message) {
 //   const div = document.createElement('div');
 //   div.classList.add('message');
-//   div.innerHTML = `<p class="meta">${message.from} <span>${message.time}</span></p> 
+//   div.innerHTML = `<p class="meta">${message.from} <span>${message.time}</span></p>
 //   <p class="text">
 //     ${message.content}
 //   </p>`;
@@ -28,18 +28,23 @@ const socket = io();
 // socket.on("connect", () => {
 //   console.log(socket.id); // x8WIv7-mJelg7on_ALbx
 // });
-
+let prevdate = "";
 // Join chatroom
 socket.emit("joinRoom", { username, room });
-socket.emit("getPastMessages",{roomName:room});
-socket.on("getPastMessagesResponse",(response)=>{
-    console.log("PastMessagesResponse");
-    console.log(response);
-    for(i in response.ret){
-      console.log(i,response.ret[i]);
-      outputMessage(response.ret[i]);
+socket.emit("getPastMessages", { roomName: room });
+socket.on("getPastMessagesResponse", (response) => {
+  console.log("PastMessagesResponse");
+  console.log(response);
+  for (i in response.ret) {
+    const newdate = response.ret[i].time.split(" ");
+    if (prevdate !== newdate[0]) {
+      prevdate = newdate[0];
+      outputDate(newdate[0]);
     }
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    console.log(i, response.ret[i]);
+    outputMessage(response.ret[i]);
+  }
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 });
 
 // Get room and users
@@ -51,7 +56,19 @@ socket.on("roomUsers", ({ room, users }) => {
 // Message from server
 socket.on("message", (message) => {
   console.log(message);
-  outputMessage(message);
+  const newdate = message.time.split(" ");
+  if (prevdate !== newdate[0]) {
+    prevdate = newdate[0];
+    outputDate(newdate[0]);
+  }
+  if (message.from === "Chatshire Bot") {
+    const div = document.createElement("div");
+    div.classList.add("chatbot-message");
+    div.innerHTML = `<p class="meta">${message.content}</p>`;
+    document.querySelector(".chat-messages").appendChild(div);
+  } else {
+    outputMessage(message);
+  }
 
   // Scroll down
   chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -82,16 +99,20 @@ chatForm.addEventListener("submit", (e) => {
 // Output message to DOM
 function outputMessage(message) {
   const div = document.createElement("div");
-
+  const time = message.time.split(" ");
   if (message.from === username) {
     div.classList.add("message-sender");
-    div.innerHTML = `<p class="meta">${message.from} <span>${message.time}</span></p> 
+    div.innerHTML = `<p class="meta">${message.from} <span>${
+      time[1] + " " + time[2]
+    }</span></p> 
   <p class="text">
     ${message.content}
   </p>`;
   } else {
     div.classList.add("message-receiver");
-    div.innerHTML = `<p class="meta">${message.from} <span>${message.time}</span></p> 
+    div.innerHTML = `<p class="meta">${message.from} <span>${
+      time[1] + " " + time[2]
+    }</span></p> 
     <p class="text">
       ${message.content}
     </p>`;
@@ -137,13 +158,21 @@ function outputUsers(users) {
 }
 
 // //Prompt the user before leave chat room
-leaveButton.addEventListener('click', () => {
-  const leaveRoom = confirm('Are you sure you want to leave the chatroom?');
+leaveButton.addEventListener("click", () => {
+  const leaveRoom = confirm("Are you sure you want to leave the chatroom?");
   const urlParams = new URLSearchParams(window.location.search);
-	const username = urlParams.get('username');
-		
+  const username = urlParams.get("username");
+
   if (leaveRoom) {
-    window.location = '../index.html?username=' + username ;
+    window.location = "../index.html?username=" + username;
   } else {
   }
 });
+
+// add Date to chat panel
+function outputDate(date) {
+  const div = document.createElement("div");
+  div.classList.add("chat-date");
+  div.innerHTML = `<p class="meta">${date}</p> `;
+  document.querySelector(".chat-messages").appendChild(div);
+}

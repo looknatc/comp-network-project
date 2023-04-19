@@ -5,12 +5,12 @@
 }
 
 :root {
-	--dark-color-a: #0C8496;
-	--dark-color-b: #DDA033;
-	--light-color: #E0D8C3;
-	--light-color-a: #E0D8C9;
-	--light-color-b: #C2E4E7;
-	--success-color: #065125;
+	--dark-color-a: #31393C;
+	--dark-color-b: #3E96F4;
+	--light-color: #EDEEEB;
+	--light-color-a: #CCC7BF;
+	--light-color-b: #FFDD94;
+	--success-color: #d9f744;
 	--error-color: #E2532F;
 }
 
@@ -178,7 +178,39 @@ a {
 	flex: 1;
 	border-radius: 6px;
 }
+.chat-messages .chat-date {
+	text-align: center;
+	border-radius: 20px 20px 20px 20px;
+	margin-left:46%;
+	max-width: 75px;
+	padding: 2px;
+	margin-top: 5px;
+	margin-bottom: 20px;
+	background-color: var(--error-color);
+}
+.chat-messages .chat-date .meta {
+	font-size: 11px;
+	font-weight: bold;
+	color: white;
+	opacity: 0.7;
+}
 
+.chat-messages .chatbot-message {
+	text-align : center;
+	border-radius: 20px 20px 20px 20px;
+	margin-top: 5px;
+	margin-bottom: 20px;
+	padding: 1px;
+	background-color:rgba(12, 12, 12, 0.111) ;
+	opacity: 0.6;
+
+}
+.chat-messages .chatbot-message .meta {
+	font-size : 12px;
+	font-weight : bold;
+	font-style : italic;
+	color : #31393C;
+}
 
 /* Join Page */
 .join-container {
@@ -309,15 +341,19 @@ a {
 }
 
 #users > li.online {
-    color: green;
+	display: block;
+    color: var(--success-color);
+	margin-left: 10px;
+	text-decoration: none;
+	
 }
+
 
 #users .dot {
 	width: 10px;
 	height: 10px;
 	border-radius: 50%;
-	background-color: rgba(128, 0, 0, 0.772);
-	/* display: inline-block; */
+	background-color: rgba(220, 25, 25, 0.772);
     margin-right: 4px;
 	display: none; /* hide the dot by default */
 }
@@ -327,9 +363,13 @@ a {
 }
 
 #users > li {
-    color: dimgrey;
+	display: block;
+    color: var(--light-color-a);
     font-weight: 800;
+	margin-left: 10px;
+	text-decoration: none;
 }
+
 
 /* icon */
 
@@ -347,36 +387,51 @@ a {
 		display: block;
 	}
 
+	.dm-main {
+		display: block;
+	}
+	
+
 	.chat-sidebar {
 		display: none;
+	}
+	
+	.chat-messages{
+		display:inline-block;
+		vertical-align: top;
+		padding: 2%;
+		max-height: 500px;
+		width : 100%;
+		overflow-y: scroll;
 	}
 }
 
 
 @media screen and (max-width: 768px) {
 	.chat-messages .message-receiver {
-	  margin-right: 100px;
+	  margin-right: 65%;
 	  border-radius: 20px;
 	}
+
   }
   
   @media screen and (max-width: 576px) {
 	.chat-messages .message-receiver {
-	  margin-right: 0;
+	  margin-right: 65%;
 	  border-radius: 20px;
 	}
   }
 
   @media screen and (max-width: 768px) {
 	.chat-messages .message-sender {
-	  margin-left: 100px;
+	  margin-left: 65%;
 	  border-radius: 20px;
 	}
   }
   
   @media screen and (max-width: 576px) {
 	.chat-messages .message-sender {
-	  margin-left: 0;
+	  margin-left: 65%;
 	  border-radius: 20px;
 	}
   }
