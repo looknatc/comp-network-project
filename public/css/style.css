@@ -354,7 +354,6 @@ a {
 	height: 10px;
 	border-radius: 50%;
 	background-color: rgba(220, 25, 25, 0.772);
-	/* display: inline-block; */
     margin-right: 4px;
 	display: none; /* hide the dot by default */
 }
