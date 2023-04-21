@@ -18,7 +18,20 @@
     <div class="chat-container">
       <header class="chat-header">
         <h1><i class="fas fa-cat"></i> Chatshire</h1>
-        <div class = "leave-container"><h3 id="me"></h3><a id="leave-btn" class="btn">Leave DM</a></div>
+        <div class = "leave-container">
+          <div class = 'search-dropdown'>
+            <a class="search-btn" type="button" data-toggle="dropdown"><i class='fas fa-search'></i></a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu">
+              <li class = 'search-li'>
+                <div class = 'search-wrapper'>
+                  <label for = 'search'>Search</label>
+                  <input type = 'search' id = 'searchbar' placeholder="Search message.." data-search>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <h3 id="me"></h3>
+          <a id="leave-btn" class="btn">Leave DM</a></div>
         
       </header>
       <main class="dm-main">
@@ -203,4 +216,87 @@ leaveButton.addEventListener('click', () => {
   } else {
   }
 });
+
+/* 
+#############################
+    search meassage
+#############################
+*/
+const searchInput = document.querySelector("[data-search]");
+const searchBtn = document.querySelector(".search-btn");
+const searchBar = document.querySelector(".search-wrapper");
+const searchIcon = document.querySelector(".fas fa-search");
+
+var matchingMessage = [];
+let currentIdx = -1;
+
+const clearMessage = () => {
+  for (var i = 0; i < matchingMessage.length; i++) {
+    matchingMessage[i].setAttribute("class", "text");
+  }
+};
+
+searchBtn.addEventListener("click", (e) => {
+  if (searchBar.className == "search-wrapper show") {
+    clearMessage();
+  }
+  searchBar.classList.toggle("show");
+});
+
+document.addEventListener("click", function (event) {
+  // If the user clicked outside of the search bar, hide it
+  console.log(searchBar);
+  if (
+    searchBar.className == "search-wrapper show" &&
+    !searchBar.contains(event.target) &&
+    event.target !== searchBtn &&
+    event.target !== searchBar &&
+    event.target.className != "fas fa-search"
+  ) {
+    searchBar.classList.toggle("show");
+    clearMessage();
+  }
+});
+// Click Enter after fill in the search bar
+
+searchInput.addEventListener("search", (e) => {
+  e.preventDefault();
+  currentIdx = -1;
+  const value = e.target.value;
+  const allMessages = document.querySelectorAll(".chat-messages .text");
+  if (value == "") {
+    clearMessage();
+  }
+
+  for (var i = 0; i < allMessages.length; i++) {
+    // messageSender[i].scrollIntoView();
+    if (value != "" && allMessages[i].textContent.includes(value)) {
+      allMessages[i].setAttribute("class", "highlight-text");
+      matchingMessage.push(allMessages[i]);
+    } else {
+      allMessages[i].setAttribute("class", "text");
+    }
+  }
+});
+// for scroll to the result of search
+searchInput.addEventListener("keydown", (e) => {
+  const key = e.key;
+  if (key == "ArrowUp") {
+    next();
+  }
+  if (key == "ArrowDown") {
+    previous();
+  }
+});
+
+const next = () => {
+  currentIdx = currentIdx + 1 > matchingMessage.length - 1 ? 0 : currentIdx + 1;
+  matchingMessage[currentIdx].scrollIntoView();
+};
+
+const previous = () => {
+  currentIdx = currentIdx - 1 < 0 ? matchingMessage.length - 1 : currentIdx - 1;
+  matchingMessage[currentIdx].scrollIntoView();
+};
+
 </script>

@@ -212,6 +212,10 @@ a {
 	color : #31393C;
 }
 
+.highlight-text{
+	color:var(--error-color);
+}
+
 /* Join Page */
 .join-container {
 	max-width: 700px;
@@ -335,9 +339,9 @@ a {
 
 .leave-container{
 	display : flex;
+	position:relative;
 	column-gap: 10px;
 	align-items: center;
-
 }
 
 #users > li.online {
@@ -368,6 +372,30 @@ a {
     font-weight: 800;
 	margin-left: 10px;
 	text-decoration: none;
+}
+
+/* search */
+.search-wrapper{
+	display : none;
+	width: 95%;
+	position:absolute;
+	flex-direction: column;
+	background-color:#3e96f4b9 ;
+	border-radius: 15px;
+	text-align: center;
+	padding: 10px;
+	gap : .6rem
+}
+.show {
+	display: block;
+  }
+
+#searchbar {
+	font-size: 1rem;
+	border-radius: 6px;
+	padding : 2px;
+	cursor: pointer;
+	width: 80%;
 }
 
 
