@@ -3,9 +3,9 @@ const users = [];
 //store all users in system {id, username}
 var allUsers= [];
 
-function getAllUserRoom(targetRoom){
-  return users.filter((user) => user.room === targetRoom);
-}
+// function getAllUserRoom(targetRoom){
+//   return users.filter((user) => user.room === targetRoom);
+// }
 function getRoom(username){
   return users.find((user) => user.username === username);
 }
@@ -23,10 +23,17 @@ function allOnlineUsers(){
 
 // user into chat room
 function userJoin(id, username, room) {
-  const user = { id, username, room };
-  users.push(user);
-  console.log("userJoin",users);
-
+  var user = findUser(username);
+  if(user == undefined){
+    user = { id, username, room, online:true };
+    users.push(user);
+    console.log("userJoin","add new",user);
+  }else{
+    user.id = id;
+    user.room = room;
+    user.online = true;
+    console.log("userJoin","update",user);
+  }
   return user;
 }
 
@@ -57,15 +64,18 @@ function getCurrentUser(id) {
 // User leaves chat
 function userLeave(id) {
   const index = users.findIndex(user => user.id === id);
-
   if (index !== -1) {
-    return users.splice(index, 1)[0];
+    //return users.splice(index, 1)[0];
+    var user = users[index];
+    user.online = false;    
   }
+  console.log("userLeave",id,user);
+  return user;
 }
 
 // Get room users
 function getRoomUsers(room) {
-  return users.filter(user => user.room === room);
+  return users.filter(user => user.room === room && user.online);
 }
 
 function isUniqueUsername(username){
@@ -85,7 +95,7 @@ module.exports = {
   getAllUsers,
   findUser,
   userJoinSystem,
-  getAllUserRoom,
+  // getAllUserRoom,
   isUniqueUsername,
   allOnlineUsers,
   users,

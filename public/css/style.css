@@ -1,4 +1,28 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+
+@font-face {
+	font-family: 'Material Symbols Outlined';
+	font-style: normal;
+	font-weight: 400;
+	src: url(material.woff2) format('woff2');
+}
+
+.material-symbols-outlined {
+	font-family: 'Material Symbols Outlined';
+	font-weight: normal;
+	font-style: normal;
+	font-size: 24px;
+	line-height: 1;
+	letter-spacing: normal;
+	text-transform: none;
+	display: inline-block;
+	white-space: nowrap;
+	word-wrap: normal;
+	direction: ltr;
+	-webkit-font-feature-settings: 'liga';
+	-webkit-font-smoothing: antialiased;
+}
+
 * {
     box-sizing: border-box;
     font-family: 'Roboto', sans-serif;
@@ -271,7 +295,9 @@ a {
 .index-sidebar {
 	background: var(--dark-color-b);
     color: #fff;
-    padding: 20px 20px 60px;
+	padding-left: 0px;
+    padding-top: 0px;
+    padding-right: 20px;
     overflow-y: auto;
 
 }
@@ -290,11 +316,16 @@ a {
 	cursor: pointer;
 } */
 .dm-btn {
-    /* background-color: #007bff; */
-    color: #fff;
-    /* border: none; */
-    /* border-radius: 3px; */
-    padding: -6px 10px;
+    /* color: #fff; */
+    /* padding: -6px 10px; */
+    margin-left: 5px;
+    cursor: pointer;
+    font-size: unset;
+}
+
+.favorite-btn{
+	color: #fff;
+	/* padding: -6px 10px; */
     margin-left: 5px;
     cursor: pointer;
     font-size: unset;
@@ -348,6 +379,42 @@ a {
 	
 }
 
+.swal2-styled.swal2-confirm {
+    background-color: var(--dark-color-b);
+}
+
+.swal2-styled.swal2-confirm:focus {
+    box-shadow: 0 0 0 3px rgb(211,209,231);
+}
+
+.users  li span.online {
+    color: var(--success-color);
+	/* margin-left: 10px; */
+	/* text-decoration: none; */
+}
+
+.users  li span {
+    color: var(--light-color-a);
+    font-weight: 800;
+	margin-left: 10px;
+	text-decoration: none;
+	cursor: pointer;
+	transform: translateY(4px);
+}
+
+.users .dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background-color: rgba(220, 25, 25, 0.772);
+    margin-right: 4px;
+	display: none; /* hide the dot by default */
+}
+
+.users div.dot.unRead {
+	display: inline-block; /* show the dot when the element has the "unread" class */
+}
+
 
 #users .dot {
 	width: 10px;
@@ -379,6 +446,9 @@ a {
   'wght' 400,
   'GRAD' 0,
   'opsz' 48
+}
+.material-symbols-outlined.fav {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;
 }
 
 
