@@ -449,6 +449,11 @@ a {
 }
 .material-symbols-outlined.fav {
     font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+	color: #af1414;
+}
+
+.swal2-title {
+	font-size: 1.25em;
 }
 
 

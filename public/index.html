@@ -478,6 +478,22 @@ var app = angular.module('myApp', []);
 		// }
 		$scope.$apply(()=>{
 			$scope.users = users;
+			// $scope.users.sort(function(a, b){
+			// 	var va = a.fav==undefined?0:1; 
+			// 	var vb = b.fav==undefined?0:1; 
+			// 	return vb - va;
+			// });
+			$scope.users.sort(function(a, b){
+			// Check if object has 'fav' field
+			var va = a.fav!=undefined? -1 : 1;
+			var vb = b.fav!=undefined? -1 : 1;
+			// If both objects have 'fav' or neither has 'fav', sort by 'online'
+			if (va === vb) {
+				return b.onlineClass === '' ? -1 : 1; // Sort by 'onlineClass' (objects with 'online' first)
+			} else {
+				return va - vb; // Sort by 'fav' (objects with 'fav' first)
+			}
+			});
 		});
 		console.log("showUser",$scope.users);
 
@@ -520,10 +536,21 @@ var app = angular.module('myApp', []);
 		// socket.emit("favourite",{username, name:user.username });
 		// sort users 
 		$scope.$apply(()=>{
+			// $scope.users.sort(function(a, b){
+			// 	var va = a.fav==undefined?0:1; 
+			// 	var vb = b.fav==undefined?0:1; 
+			// 	return vb - va;
+			// });
 			$scope.users.sort(function(a, b){
-				var va = a.fav==undefined?0:1; 
-				var vb = b.fav==undefined?0:1; 
-				return vb - va;
+			// Check if object has 'fav' field
+			var va = a.fav!=undefined? -1 : 1;
+			var vb = b.fav!=undefined? -1 : 1;
+			// If both objects have 'fav' or neither has 'fav', sort by 'online'
+			if (va === vb) {
+				return b.onlineClass === '' ? -1 : 1; // Sort by 'onlineClass' (objects with 'online' first)
+			} else {
+				return va - vb; // Sort by 'fav' (objects with 'fav' first)
+			}
 			});
 		});
 		//fav = response
