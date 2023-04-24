@@ -10,11 +10,13 @@
 			integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk="
 			crossorigin="anonymous"
 		/>
-		<link rel="stylesheet" href="css/style.css" />
+		
 		<title>Chatshire App</title>
 		<script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
 		<!-- <script src=”https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js”></script> -->
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 		<script type="test/javascript" src="utils/helper.js"></script>
+		<link rel="stylesheet" href="css/style.css" />
 	</head>
 	<body>
 		<div class="join-container">
@@ -65,13 +67,35 @@ $(function() {
           } else {
             // Display an error message to the user
             // alert('Username already taken. Please choose another username.');
-			const confirmUsername = confirm(`your username is already used, continue if you are ${username}.`);
-			if (confirmUsername) {
-				// window.location = '../index.html';
-				socket.emit('userJoin', {username});
-				window.location.href = '/index.html?username=' + username;
-			} else {
-			}
+			Swal.fire({
+				title: `your username is already used, continue if you are ${username}.`,
+				showDenyButton: true,
+				allowOutsideClick: false,
+				//showCancelButton: true,
+				confirmButtonText: 'Continue',
+				denyButtonText: 'Back',
+				// customClass: {
+				// 	actions: 'my-actions',
+				// 	cancelButton: 'order-1 right-gap',
+				// 	confirmButton: 'order-2',
+				// 	denyButton: 'order-3',
+				// }
+			}).then((result) => {
+				if (result.isConfirmed) {
+					//Swal.fire('Saved!', '', 'success')
+					socket.emit('userJoin', {username});
+					window.location.href = '/index.html?username=' + username;
+				} else if (result.isDenied) {
+					//Swal.fire('Changes are not saved', '', 'info')
+				}
+			})
+			// const confirmUsername = confirm(`your username is already used, continue if you are ${username}.`);
+			// if (confirmUsername) {
+			// 	// window.location = '../index.html';
+			// 	socket.emit('userJoin', {username});
+			// 	window.location.href = '/index.html?username=' + username;
+			// } else {
+			// }
           }
         });
 	});	

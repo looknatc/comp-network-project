@@ -28,6 +28,10 @@ const readStatus = [
     ],
   },
 ];
+
+const favourite = {
+  "xxxx":["yyyy","zzzzz"],
+}
 const {
   userJoin,
   getCurrentUser,
@@ -35,7 +39,7 @@ const {
   getRoomUsers,
   findUser,
   userJoinSystem,
-  getAllUserRoom,
+  // getAllUserRoom,
   isUniqueUsername,
   getAllUsers,
   allOnlineUsers,
@@ -134,12 +138,27 @@ function insertMessage(obj) {
   });
   console.log("server: insertMessage (new owner)", messageStorage);
 }
+// function difference(a, b) {
+//   var res= a.filter(item => !b.includes(item));
+//   console.log("difference",a,b,res)
+// }
+function difference(a, b) {
+  const usernamesA = a.map(element => element.username);
+  const usernamesB = b.map(element => element.username);
+  var res =  usernamesA.filter(username => !usernamesB.includes(username));
+  console.log("difference",a,b,res)
+  return res 
+}
+
 function showAllUserAndOnlineUser() {
   var allUser = getAllUsers();
   io.emit("allUserResponse", allUser);
   var allOnlineUser = allOnlineUsers();
+  var offline = difference(allUser,allOnlineUser);
+  
   // console.log("allOnlineUserResponse",user)
-  io.emit("allOnlineUserResponse", { allOnlineUser });
+  io.emit("allOnlineUserResponse", { allOnlineUser});
+  io.emit("showUser", { allOnlineUser,allUser,offline});
 }
 
 io.on("connection", (socket) => {
@@ -272,6 +291,7 @@ io.on("connection", (socket) => {
   // Runs when client disconnects
   socket.on("disconnect", () => {
     console.log("disconnect called printusers", users);
+
     const user = userLeave(socket.id);
     console.log("disconnec userLeave", user);
     if (user) {
@@ -381,6 +401,31 @@ io.on("connection", (socket) => {
 
     io.to(user.room).emit("message", formatMessage(user.username, msg));
   });
+
+  socket.on("favourite",({username,name})=>{
+    if(username in favourite){
+      const favIndex = favourite[username].indexOf(name);
+      if (favIndex === -1) {
+        // If the favorite does not exist, add it to the array
+        favourite[username].push(name);
+      } else {
+        // If the favorite exists, remove it from the array using the splice method
+        favourite[username].splice(favIndex, 1);
+      }
+    }else{
+      favourite[username] = [name]
+    }
+    console.log("favourite",favourite[username])
+    socket.emit("fav_response",favourite[username]);
+
+  });
+  socket.on("get_fav",({username})=>{
+    if(! favourite[username]){
+      socket.emit("fav_response",[])
+    }else{
+      socket.emit("fav_response",favourite[username])
+    }
+  })
 
   //   // Runs when client disconnects
   //   socket.on("disconnect", () => {

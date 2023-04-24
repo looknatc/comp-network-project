@@ -165,14 +165,18 @@ function outputUsers(users) {
 
 // //Prompt the user before leave chat room
 leaveButton.addEventListener("click", () => {
-  const leaveRoom = confirm("Are you sure you want to leave the chatroom?");
+  // const leaveRoom = confirm("Are you sure you want to leave the chatroom?");
+  // const urlParams = new URLSearchParams(window.location.search);
+  // const username = urlParams.get("username");
+
+  // if (leaveRoom) {
+  //   window.location = "../index.html?username=" + username;
+  // } else {
+  // }
   const urlParams = new URLSearchParams(window.location.search);
   const username = urlParams.get("username");
+  window.location = "../index.html?username=" + username;
 
-  if (leaveRoom) {
-    window.location = "../index.html?username=" + username;
-  } else {
-  }
 });
 
 // add Date to chat panel
