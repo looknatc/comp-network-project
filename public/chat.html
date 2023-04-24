@@ -18,7 +18,7 @@
         <h1><i class="fas fa-cat"></i> Chatshire</h1>
         
         <div class = "leave-container">
-          <div class = 'search-dropdown'>
+          <!-- <div class = 'search-dropdown'>
             <a class="search-btn" type="button" data-toggle="dropdown"><i class='fas fa-search'></i></a>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenu">
               <li class = 'search-li'>
@@ -28,7 +28,7 @@
                 </div>
               </li>
             </ul>
-          </div>
+          </div> -->
           <h3 id="me"></h3>
           <a id="leave-btn" class="btn">Leave Room</a>
         </div>
@@ -40,7 +40,17 @@
           <h3><i class="fas fa-users"></i> Users</h3>
           <ul id="users"></ul>
         </div>
+        <div class = 'chat-panel'>
+          <div class = 'search-wrapper'>
+            <!-- <i class='fas fa-search'></i> -->
+            <input type = 'search' id = 'searchbar' placeholder="Search message.." data-search>
+            <div class = 'search-next-container'>
+              <a class="prev-search-btn" type="button"><i class="fas fa-regular fa-chevron-up"></i></a>
+              <a class="next-search-btn" type="button" ><i class="fas fa-regular fa-chevron-down"></i></a>
+            </div>
+          </div>
         <div class="chat-messages"></div>
+        </div>
       </main>
       <div class="chat-form-container">
         <form id="chat-form">
