@@ -33,6 +33,7 @@
 	--dark-color-b: #3E96F4;
 	--light-color: #EDEEEB;
 	--light-color-a: #CCC7BF;
+	--light-color-hover:#a19786;
 	--light-color-b: #FFDD94;
 	--success-color: #d9f744;
 	--error-color: #E2532F;
@@ -152,6 +153,11 @@ a {
 	box-shadow: rgb(0 0 0 / 25%) 0px 2px 5px 2px;
 	
 }
+.chat-messages .message-sender:hover {
+	background-color: var(--light-color-hover);
+	cursor: pointer;
+  } 
+
 .chat-messages .message-receiver {
 	padding: 10px;
 	margin-bottom: 15px;

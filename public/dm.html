@@ -55,8 +55,10 @@
   </body>
 </html>
 <script>
+var id=0;
 var name = new URLSearchParams(window.location.search).get('name');
 var from = new URLSearchParams(window.location.search).get('from');
+const socket = io();
 console.log(name,from);
 // function outputMessage(message) {
 //   console.log("hey this id tontong",message)
@@ -87,11 +89,38 @@ function outputDate(date){
   document.querySelector(".chat-messages").appendChild(div);
 }
 function outputMessage2(message) {
-//   console.log("hey this id tontong2",message)
   const div = document.createElement('div');
   const time = message.time.split(' ')
+  div.id = `${message.from} ${id}`;
+  id += 1;
   if (message.from === from){
     // console.log("from sender");
+    div.onclick = function() {
+      //const username = this.textContent.split(' ')[0];
+      if (confirm("Are you sure you want to unsend this message?")) {
+        //remove the <p> component
+        this.removeChild(this.firstElementChild);
+        this.removeChild(this.firstElementChild);
+
+        this.classList.remove("message-sender");
+        this.classList.add("chatbot-message");
+        this.innerHTML = `<p class="meta">${message.from} has unsend the message</p>`;
+console.log(getOwner(name,from));
+        console.log(message);
+
+        //Emit unsend message to server
+        socket.emit("unsendMessage", {
+          id: this.id.split(' ')[1],
+          room: getOwner(name,from),
+          messageId: this.id, // the ID of the message being unsent
+          username: message.from, // the username of the sender
+        });
+
+        alert("Message successfully unsent!");
+      } else {
+        alert("Message not unsent.");
+      }
+    };
     div.classList.add('message-sender');
   div.innerHTML = `<p class="meta">${message.from} <span>${time[1] + ' ' + time[2]}</span></p> 
   <p class="text">
@@ -104,6 +133,7 @@ function outputMessage2(message) {
     ${message.content}
   </p>`;
   }
+
 
   document.querySelector('.chat-messages').appendChild(div);
 }
@@ -120,7 +150,6 @@ $(function(){
     console.log( "ready!" );
     $("#person-name").html(name);
     $("#me").html(from);
-	const socket = io();
 
     socket.emit("joinRoom",{
         username:from,
@@ -176,7 +205,7 @@ $(function(){
             to:name,
             from:from,
         }
-        socket.emit('chatMessage', msg);
+        socket.emit('chatMessage', {msg, id});
         // socket.emit('directMessage', value);
         // socket.emit('directMessage', value);
         // outputMessage(value);
@@ -191,6 +220,16 @@ $(function(){
 	// 	console.log("directMessage",x);
     //     outputMessage(x);
 	// });
+});
+
+socket.on("unsendMessage", data => {
+  
+  if(data.username != from){
+    const div = document.getElementById(`${data.messageId}`);
+    div.classList.remove("message-receiver");
+    div.classList.add("chatbot-message");
+    div.innerHTML = `<p class="meta">${data.username} has unsend the message</p>`;
+  }
 });
 
 

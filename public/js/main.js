@@ -5,6 +5,7 @@ const userList = document.getElementById("users");
 const leaveButton = document.getElementById("leave-btn");
 const roomList = document.getElementById("room");
 const myName = document.getElementById("me");
+var id = 0;
 
 // const rooms = ['Java','PHP']
 // Get username and room from URL
@@ -89,30 +90,57 @@ chatForm.addEventListener("submit", (e) => {
   //   }
 
   // Emit message to server
-  socket.emit("chatMessage", msg);
+  socket.emit("chatMessage", { msg, id });
 
   // Clear input
   e.target.elements.msg.value = "";
   e.target.elements.msg.focus();
 });
 
+
+
 // Output message to DOM
 function outputMessage(message) {
   const div = document.createElement("div");
   const time = message.time.split(" ");
+  div.id = `${message.from} ${id}`;
+  id += 1;
   if (message.from === username) {
     div.classList.add("message-sender");
-    div.innerHTML = `<p class="meta">${message.from} <span>${
-      time[1] + " " + time[2]
-    }</span></p> 
+
+    div.onclick = function () {
+      //const username = this.textContent.split(' ')[0];
+      if (confirm("Are you sure you want to unsend this message?")) {
+        //remove the <p> component
+        this.removeChild(this.firstElementChild);
+        this.removeChild(this.firstElementChild);
+
+        this.classList.remove("message-sender");
+        this.classList.add("chatbot-message");
+        this.innerHTML = `<p class="meta">${username} has unsend the message</p>`;
+
+        //Emit unsend message to server
+        socket.emit("unsendMessage", {
+          id: this.id.split(' ')[1],
+          room: room,
+          messageId: this.id, // the ID of the message being unsent
+          username: username, // the username of the sender
+        });
+
+        alert("Message successfully unsent!");
+      } else {
+        alert("Message not unsent.");
+      }
+    };
+    div.innerHTML = `<p class="meta">${message.from} <span>${time[1] + " " + time[2]
+      }</span></p> 
   <p class="text">
     ${message.content}
   </p>`;
   } else {
     div.classList.add("message-receiver");
-    div.innerHTML = `<p class="meta">${message.from} <span>${
-      time[1] + " " + time[2]
-    }</span></p> 
+    div.innerHTML = `<p class="meta">${message.from} <span>${time[1] + " " + time[2]
+      }</span></p> 
     <p class="text">
       ${message.content}
     </p>`;
@@ -129,6 +157,18 @@ function outputMessage(message) {
   // div.appendChild(para);
   document.querySelector(".chat-messages").appendChild(div);
 }
+
+socket.on("unsendMessage", data => {
+  console.log("Unsend from main.js ", data);
+  if (data.username != username) {
+    const div = document.getElementById(`${data.messageId}`);
+    div.classList.remove("message-receiver");
+    div.classList.add("chatbot-message");
+    div.innerHTML = `<p class="meta">${data.username} has unsend the message</p>`;
+  }
+});
+
+
 socket.on("directMessage", (x) => {
   console.log("directMessage", x);
 });
