@@ -55,44 +55,23 @@
   </body>
 </html>
 <script>
-var id=0;
+var uuid = "id" + Math.random().toString(16).slice(2);
 var name = new URLSearchParams(window.location.search).get('name');
 var from = new URLSearchParams(window.location.search).get('from');
 const socket = io();
 console.log(name,from);
-// function outputMessage(message) {
-//   console.log("hey this id tontong",message)
-//   const div = document.createElement('div');
-//   if (message.from === from){
-//     console.log("from sender");
-//     div.classList.add('message-sender');
-//     div.innerHTML = `<p class="meta">${message.from} </p> 
-//   <p class="text">
-//     ${message.content}
-//   </p>`;
-//   }else{
-//     console.log("from receiver");
-//     div.classList.add('message-receiver');
-//   div.innerHTML = `<p class="meta">${message.from} </p> 
-//   <p class="text">
-//     ${message.content}
-//   </p>`;
-//   }
-  
 
-//   document.querySelector('.chat-messages').appendChild(div);
-// }
 function outputDate(date){
   const div = document.createElement("div");
   div.classList.add("chat-date");
   div.innerHTML = `<p class="meta">${date}</p> `;
   document.querySelector(".chat-messages").appendChild(div);
 }
-function outputMessage2(message) {
+
+function outputMessage2(message, id) {
   const div = document.createElement('div');
   const time = message.time.split(' ')
-  div.id = `${message.from} ${id}`;
-  id += 1;
+  div.id = id;
   if (message.from === from){
     // console.log("from sender");
     div.onclick = function() {
@@ -105,14 +84,11 @@ function outputMessage2(message) {
         this.classList.remove("message-sender");
         this.classList.add("chatbot-message");
         this.innerHTML = `<p class="meta">${message.from} has unsend the message</p>`;
-console.log(getOwner(name,from));
-        console.log(message);
 
         //Emit unsend message to server
         socket.emit("unsendMessage", {
-          id: this.id.split(' ')[1],
+          id: id,
           room: getOwner(name,from),
-          messageId: this.id, // the ID of the message being unsent
           username: message.from, // the username of the sender
         });
 
@@ -166,11 +142,11 @@ $(function(){
             prevdate = newdate[0];
             outputDate(newdate[0])
           }
-            outputMessage2(response.ret[i]);
+            outputMessage2(response.ret[i], response.ret[i].id);
         }
         chatMessages.scrollTop = chatMessages.scrollHeight;
     });
-    socket.on('message', (message) => {
+    socket.on('message', (message, id) => {
         console.log("dm.html message",message);
         const newdate = message.time.split(" ");
         if (prevdate !== newdate[0]){
@@ -183,7 +159,7 @@ $(function(){
           div.innerHTML = `<p class="meta">${message.content}</p>`;
           document.querySelector(".chat-messages").appendChild(div);
         }else{
-          outputMessage2(message);
+          outputMessage2(message, id);
         }
         
 
@@ -205,7 +181,8 @@ $(function(){
             to:name,
             from:from,
         }
-        socket.emit('chatMessage', {msg, id});
+        socket.emit('chatMessage', msg, uuid);
+        uuid = "id" + Math.random().toString(16).slice(2);
         // socket.emit('directMessage', value);
         // socket.emit('directMessage', value);
         // outputMessage(value);
@@ -225,7 +202,7 @@ $(function(){
 socket.on("unsendMessage", data => {
   
   if(data.username != from){
-    const div = document.getElementById(`${data.messageId}`);
+    const div = document.getElementById(`${data.id}`);
     div.classList.remove("message-receiver");
     div.classList.add("chatbot-message");
     div.innerHTML = `<p class="meta">${data.username} has unsend the message</p>`;

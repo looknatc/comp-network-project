@@ -3,7 +3,6 @@ const http = require("http");
 const express = require("express");
 const socketio = require("socket.io");
 const formatMessage = require("./utils/messages");
-var id = 0;
 // const createAdapter = require("@socket.io/redis-adapter").createAdapter;
 // const redis = require("redis");
 // require("dotenv").config();
@@ -154,10 +153,10 @@ function difference(a, b) {
   return res 
 }
 
+//find the unsend message and delete it
 function findMessage(room, id){
-  const indexRoom = messageStorage.findIndex(data => data.owner === room);
-  
   console.log(id);
+  const indexRoom = messageStorage.findIndex(data => data.owner === room);
   messageStorage[indexRoom].messages = messageStorage[indexRoom].messages.filter(message => message.id != id);
   console.log("Current ", messageStorage[indexRoom].messages);
 }
@@ -278,14 +277,14 @@ io.on("connection", (socket) => {
     socket.join(user.room);
     console.log("server joinRoom updateRead", user.username, user.room, 0);
     updateRead(user.username, user.room, 0); //status read
-    socket.emit("message", formatMessage(botName, "Welcome to Chatshire!"));
+    socket.emit("message", formatMessage(botName, "Welcome to Chatshire!"), 0);
 
     // Broadcast when a user connects
     socket.broadcast
       .to(user.room)
       .emit(
         "message",
-        formatMessage(botName, `${user.username} has joined the chat`)
+        formatMessage(botName, `${user.username} has joined the chat`), 0
       );
     // Send users and room info
     io.to(user.room).emit("roomUsers", {
@@ -311,7 +310,7 @@ io.on("connection", (socket) => {
     if (user) {
       io.to(user.room).emit(
         "message",
-        formatMessage(botName, `${user.username} has left the chat`)
+        formatMessage(botName, `${user.username} has left the chat`), 0
       );
       io.to(user.room).emit("roomUsers", {
         room: user.room,
@@ -355,12 +354,7 @@ io.on("connection", (socket) => {
     // console.log(roomName);
     var ret;
     for (i in messageStorage) {
-      console.log(
-        `messageStorage[${i}]"`,
-        messageStorage[i],
-        messageStorage[i].owner,
-        roomName
-      );
+      
       if (messageStorage[i].owner === roomName) {
         ret = messageStorage[i].messages;
         console.log("find ret", ret);
@@ -372,7 +366,7 @@ io.on("connection", (socket) => {
     socket.emit("getPastMessagesResponse", { ret });
   });
 
-  socket.on("chatMessage", ({msg, id}) => {
+  socket.on("chatMessage", (msg, id) => {
     // console.log(msg);
     const user = getCurrentUser(socket.id);
     // var sendTime = moment().format('h:mm a');
@@ -414,7 +408,7 @@ io.on("connection", (socket) => {
     //   io.to(user.room).emit("message",formatMessage(user.username, msg))
     // }
 
-    io.to(user.room).emit("message", formatMessage(user.username, msg));
+    io.to(user.room).emit("message", formatMessage(user.username, msg), id);
   });
 
   //Unsend message
@@ -422,9 +416,8 @@ io.on("connection", (socket) => {
     //delete the message in storage
 
     // broadcast the updated message to all connected clients
-    //findMessage(room, messageTime, username)
-    
-    findMessage(data.room, data.id, data.username);
+    //nameWithId
+    findMessage(data.room, data.id);
     io.emit("unsendMessage", data);
   });
 
