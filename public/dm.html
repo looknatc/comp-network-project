@@ -9,6 +9,7 @@
       integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk="
       crossorigin="anonymous"
     />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="css/style.css" />
     <title>Chatshire App</title>
     <script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
@@ -66,43 +67,86 @@
   </body>
 </html>
 <script>
+var uuid = "id" + Math.random().toString(16).slice(2);
 var name = new URLSearchParams(window.location.search).get('name');
 var from = new URLSearchParams(window.location.search).get('from');
+const socket = io();
 console.log(name,from);
-// function outputMessage(message) {
-//   console.log("hey this id tontong",message)
-//   const div = document.createElement('div');
-//   if (message.from === from){
-//     console.log("from sender");
-//     div.classList.add('message-sender');
-//     div.innerHTML = `<p class="meta">${message.from} </p> 
-//   <p class="text">
-//     ${message.content}
-//   </p>`;
-//   }else{
-//     console.log("from receiver");
-//     div.classList.add('message-receiver');
-//   div.innerHTML = `<p class="meta">${message.from} </p> 
-//   <p class="text">
-//     ${message.content}
-//   </p>`;
-//   }
-  
 
-//   document.querySelector('.chat-messages').appendChild(div);
-// }
 function outputDate(date){
   const div = document.createElement("div");
   div.classList.add("chat-date");
   div.innerHTML = `<p class="meta">${date}</p> `;
   document.querySelector(".chat-messages").appendChild(div);
 }
-function outputMessage2(message) {
-//   console.log("hey this id tontong2",message)
+
+function outputMessage2(message, id) {
   const div = document.createElement('div');
   const time = message.time.split(' ')
+  div.id = id;
   if (message.from === from){
     // console.log("from sender");
+
+    // -------------------------------disable melete msg for DM cause it does not correctly handle noti---------------
+  //   div.onclick = function() {
+  //     //const username = this.textContent.split(' ')[0];
+  //     Swal.fire({
+	// 		title: 'Are you sure you want to unsend this message?',
+	// 		showDenyButton: true,
+	// 		allowOutsideClick: false,
+	// 		//showCancelButton: true,
+	// 		confirmButtonText: 'Unsend',
+	// 		denyButtonText: 'Back',
+	// 		// customClass: {
+	// 		// 	actions: 'my-actions',
+	// 		// 	cancelButton: 'order-1 right-gap',
+	// 		// 	confirmButton: 'order-2',
+	// 		// 	denyButton: 'order-3',
+	// 		// }
+	// 	}).then((result) => {
+	// 		if (result.isConfirmed) {
+	// 			this.removeChild(this.firstElementChild);
+  //       this.removeChild(this.firstElementChild);
+
+  //       this.classList.remove("message-sender");
+  //       this.classList.add("chatbot-message");
+  //       this.innerHTML = `<p class="meta">${message.from} has unsend the message</p>`;
+
+  //       //Emit unsend message to server
+  //       socket.emit("unsendMessage", {
+  //         id: id,
+  //         room: getOwner(name,from),
+  //         username: message.from, // the username of the sender
+  //       });
+	// 		} else if (result.isDenied) {
+	// 			//Swal.fire('Changes are not saved', '', 'info')
+	// 		}
+	// 	})
+  // };
+
+
+
+      // if (confirm("Are you sure you want to unsend this message?")) {
+      //   //remove the <p> component
+      //   this.removeChild(this.firstElementChild);
+      //   this.removeChild(this.firstElementChild);
+
+      //   this.classList.remove("message-sender");
+      //   this.classList.add("chatbot-message");
+      //   this.innerHTML = `<p class="meta">${message.from} has unsend the message</p>`;
+
+      //   //Emit unsend message to server
+      //   socket.emit("unsendMessage", {
+      //     id: id,
+      //     room: getOwner(name,from),
+      //     username: message.from, // the username of the sender
+      //   });
+
+      //   // alert("Message successfully unsent!");
+      // } else {
+      //   // alert("Message not unsent.");
+      // }
+    // };
     div.classList.add('message-sender');
   div.innerHTML = `<p class="meta">${message.from} <span>${time[1] + ' ' + time[2]}</span></p> 
   <p class="text">
@@ -115,6 +159,7 @@ function outputMessage2(message) {
     ${message.content}
   </p>`;
   }
+
 
   document.querySelector('.chat-messages').appendChild(div);
 }
@@ -131,7 +176,6 @@ $(function(){
     console.log( "ready!" );
     $("#person-name").html(name);
     $("#me").html(from);
-	const socket = io();
 
     socket.emit("joinRoom",{
         username:from,
@@ -148,11 +192,11 @@ $(function(){
             prevdate = newdate[0];
             outputDate(newdate[0])
           }
-            outputMessage2(response.ret[i]);
+            outputMessage2(response.ret[i], response.ret[i].id);
         }
         chatMessages.scrollTop = chatMessages.scrollHeight;
     });
-    socket.on('message', (message) => {
+    socket.on('message', (message, id) => {
         console.log("dm.html message",message);
         const newdate = message.time.split(" ");
         if (prevdate !== newdate[0]){
@@ -165,7 +209,7 @@ $(function(){
           div.innerHTML = `<p class="meta">${message.content}</p>`;
           document.querySelector(".chat-messages").appendChild(div);
         }else{
-          outputMessage2(message);
+          outputMessage2(message, id);
         }
         
 
@@ -187,7 +231,8 @@ $(function(){
             to:name,
             from:from,
         }
-        socket.emit('chatMessage', msg);
+        socket.emit('chatMessage', msg, uuid);
+        uuid = "id" + Math.random().toString(16).slice(2);
         // socket.emit('directMessage', value);
         // socket.emit('directMessage', value);
         // outputMessage(value);
@@ -202,6 +247,16 @@ $(function(){
 	// 	console.log("directMessage",x);
     //     outputMessage(x);
 	// });
+});
+
+socket.on("unsendMessage", data => {
+  
+  if(data.username != from){
+    const div = document.getElementById(`${data.id}`);
+    div.classList.remove("message-receiver");
+    div.classList.add("chatbot-message");
+    div.innerHTML = `<p class="meta">${data.username} has unsend the message</p>`;
+  }
 });
 
 

@@ -5,6 +5,7 @@ const userList = document.getElementById("users");
 const leaveButton = document.getElementById("leave-btn");
 const roomList = document.getElementById("room");
 const myName = document.getElementById("me");
+var uuid = "id" + Math.random().toString(16).slice(2);
 
 // for search
 const searchInput = document.querySelector("[data-search]");
@@ -47,7 +48,7 @@ socket.on("getPastMessagesResponse", (response) => {
       outputDate(newdate[0]);
     }
     console.log(i, response.ret[i]);
-    outputMessage(response.ret[i]);
+    outputMessage(response.ret[i], response.ret[i].id);
   }
   chatMessages.scrollTop = chatMessages.scrollHeight;
 });
@@ -59,8 +60,8 @@ socket.on("roomUsers", ({ room, users }) => {
 });
 
 // Message from server
-socket.on("message", (message) => {
-  console.log(message);
+socket.on("message", (message, id) => {
+  console.log(message, id);
   const newdate = message.time.split(" ");
   if (prevdate !== newdate[0]) {
     prevdate = newdate[0];
@@ -72,7 +73,7 @@ socket.on("message", (message) => {
     div.innerHTML = `<p class="meta">${message.content}</p>`;
     document.querySelector(".chat-messages").appendChild(div);
   } else {
-    outputMessage(message);
+    outputMessage(message, id);
   }
 
   // Scroll down
@@ -85,39 +86,91 @@ chatForm.addEventListener("submit", (e) => {
 
   // Get message text
   const msg = e.target.elements.msg.value;
-  // console.log(msg);
-
-  // msg = msg.trim();
-
-  //   if (!msg) {
-  //     return false;
-  //   }
-
+  
   // Emit message to server
-  socket.emit("chatMessage", msg);
-
+  socket.emit("chatMessage",  msg, uuid );
+  uuid = "id" + Math.random().toString(16).slice(2);
+  console.log("ID ", uuid);
   // Clear input
   e.target.elements.msg.value = "";
   e.target.elements.msg.focus();
 });
 
+
+
 // Output message to DOM
-function outputMessage(message) {
+function outputMessage(message, id) {
   const div = document.createElement("div");
   const time = message.time.split(" ");
+  div.id = id;
+
   if (message.from === username) {
     div.classList.add("message-sender");
-    div.innerHTML = `<p class="meta">${message.from} <span>${
-      time[1] + " " + time[2]
-    }</span></p> 
+
+    div.onclick = function () {
+      //const username = this.textContent.split(' ')[0];
+      Swal.fire({
+        title: 'Are you sure you want to unsend this message?',
+        showDenyButton: true,
+        allowOutsideClick: false,
+        //showCancelButton: true,
+        confirmButtonText: 'Unsend',
+        denyButtonText: 'Back',
+        // customClass: {
+        // 	actions: 'my-actions',
+        // 	cancelButton: 'order-1 right-gap',
+        // 	confirmButton: 'order-2',
+        // 	denyButton: 'order-3',
+        // }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.removeChild(this.firstElementChild);
+          this.removeChild(this.firstElementChild);
+  
+          this.classList.remove("message-sender");
+          this.classList.add("chatbot-message");
+          this.innerHTML = `<p class="meta">${message.from} has unsend the message</p>`;
+  
+          //Emit unsend message to server
+          socket.emit("unsendMessage", {
+                id: this.id,
+                room: room,
+                username: username, // the username of the sender
+              });
+        } else if (result.isDenied) {
+          //Swal.fire('Changes are not saved', '', 'info')
+        }
+      })
+      // if (confirm("Are you sure you want to unsend this message?")) {
+      //   //remove the <p> component
+      //   this.removeChild(this.firstElementChild);
+      //   this.removeChild(this.firstElementChild);
+
+      //   this.classList.remove("message-sender");
+      //   this.classList.add("chatbot-message");
+      //   this.innerHTML = `<p class="meta">${username} has unsend the message</p>`;
+
+      //   //Emit unsend message to server
+      //   socket.emit("unsendMessage", {
+      //     id: this.id,
+      //     room: room,
+      //     username: username, // the username of the sender
+      //   });
+
+      //   alert("Message successfully unsent!");
+      // } else {
+      //   alert("Message not unsent.");
+      // }
+    };
+    div.innerHTML = `<p class="meta">${message.from} <span>${time[1] + " " + time[2]
+      }</span></p> 
   <p class="text">
     ${message.content}
   </p>`;
   } else {
     div.classList.add("message-receiver");
-    div.innerHTML = `<p class="meta">${message.from} <span>${
-      time[1] + " " + time[2]
-    }</span></p> 
+    div.innerHTML = `<p class="meta">${message.from} <span>${time[1] + " " + time[2]
+      }</span></p> 
     <p class="text">
       ${message.content}
     </p>`;
@@ -134,6 +187,17 @@ function outputMessage(message) {
   // div.appendChild(para);
   document.querySelector(".chat-messages").appendChild(div);
 }
+
+socket.on("unsendMessage", data => {
+  if (data.username != username) {
+    const div = document.getElementById(`${data.id}`);
+    div.classList.remove("message-receiver");
+    div.classList.add("chatbot-message");
+    div.innerHTML = `<p class="meta">${data.username} has unsend the message</p>`;
+  }
+});
+
+
 socket.on("directMessage", (x) => {
   console.log("directMessage", x);
 });
