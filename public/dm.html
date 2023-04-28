@@ -84,45 +84,50 @@ function outputMessage2(message, id) {
   const div = document.createElement('div');
   const time = message.time.split(' ')
   div.id = id;
-  if (message.from === from){
+  if(message.from === "delete"){
+    div.classList.add("chatbot-message");
+    div.innerHTML = `<p class="meta">${message.content}</p>`;
+    document.querySelector(".chat-messages").appendChild(div);
+  }
+  else if (message.from === from){
     // console.log("from sender");
 
     // -------------------------------disable melete msg for DM cause it does not correctly handle noti---------------
-  //   div.onclick = function() {
-  //     //const username = this.textContent.split(' ')[0];
-  //     Swal.fire({
-	// 		title: 'Are you sure you want to unsend this message?',
-	// 		showDenyButton: true,
-	// 		allowOutsideClick: false,
-	// 		//showCancelButton: true,
-	// 		confirmButtonText: 'Unsend',
-	// 		denyButtonText: 'Back',
-	// 		// customClass: {
-	// 		// 	actions: 'my-actions',
-	// 		// 	cancelButton: 'order-1 right-gap',
-	// 		// 	confirmButton: 'order-2',
-	// 		// 	denyButton: 'order-3',
-	// 		// }
-	// 	}).then((result) => {
-	// 		if (result.isConfirmed) {
-	// 			this.removeChild(this.firstElementChild);
-  //       this.removeChild(this.firstElementChild);
+    div.onclick = function() {
+      //const username = this.textContent.split(' ')[0];
+      Swal.fire({
+			title: 'Are you sure you want to unsend this message?',
+			showDenyButton: true,
+			allowOutsideClick: false,
+			//showCancelButton: true,
+			confirmButtonText: 'Unsend',
+			denyButtonText: 'Back',
+			// customClass: {
+			// 	actions: 'my-actions',
+			// 	cancelButton: 'order-1 right-gap',
+			// 	confirmButton: 'order-2',
+			// 	denyButton: 'order-3',
+			// }
+		}).then((result) => {
+			if (result.isConfirmed) {
+				this.removeChild(this.firstElementChild);
+        this.removeChild(this.firstElementChild);
 
-  //       this.classList.remove("message-sender");
-  //       this.classList.add("chatbot-message");
-  //       this.innerHTML = `<p class="meta">${message.from} has unsend the message</p>`;
+        this.classList.remove("message-sender");
+        this.classList.add("chatbot-message");
+        this.innerHTML = `<p class="meta">${message.from} has unsend the message</p>`;
 
-  //       //Emit unsend message to server
-  //       socket.emit("unsendMessage", {
-  //         id: id,
-  //         room: getOwner(name,from),
-  //         username: message.from, // the username of the sender
-  //       });
-	// 		} else if (result.isDenied) {
-	// 			//Swal.fire('Changes are not saved', '', 'info')
-	// 		}
-	// 	})
-  // };
+        //Emit unsend message to server
+        socket.emit("unsendMessage", {
+          id: id,
+          room: getOwner(name,from),
+          username: message.from, // the username of the sender
+        });
+			} else if (result.isDenied) {
+				//Swal.fire('Changes are not saved', '', 'info')
+			}
+		})
+  };
 
 
 
@@ -336,12 +341,12 @@ nextSerachBtn.addEventListener("click", (e) => {
 
 const next = () => {
   currentIdx = currentIdx + 1 > matchingMessage.length - 1 ? 0 : currentIdx + 1;
-  matchingMessage[currentIdx].scrollIntoView();
+  matchingMessage[currentIdx].scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
 const previous = () => {
   currentIdx = currentIdx - 1 < 0 ? matchingMessage.length - 1 : currentIdx - 1;
-  matchingMessage[currentIdx].scrollIntoView();
+  matchingMessage[currentIdx].scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
 </script>

@@ -104,7 +104,12 @@ function outputMessage(message, id) {
   const time = message.time.split(" ");
   div.id = id;
 
-  if (message.from === username) {
+  if (message.from === "delete") {
+    div.classList.add("chatbot-message");
+    div.innerHTML = `<p class="meta">${message.content}</p>`;
+    document.querySelector(".chat-messages").appendChild(div);
+  }
+  else if (message.from === username) {
     div.classList.add("message-sender");
 
     div.onclick = function () {
