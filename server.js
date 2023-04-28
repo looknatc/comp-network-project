@@ -154,10 +154,17 @@ function difference(a, b) {
 }
 
 //find the unsend message and delete it
-function findMessage(room, id){
+// nat
+function findMessage(room, id,username){
   console.log(id);
   const indexRoom = messageStorage.findIndex(data => data.owner === room);
-  messageStorage[indexRoom].messages = messageStorage[indexRoom].messages.filter(message => message.id != id);
+  console.log("findMessage messageStorage[indexRoom]",messageStorage[indexRoom])
+  unsend_msg =  messageStorage[indexRoom].messages.filter(message => message.id === id)
+  console.log("findMessage unsend_msg",unsend_msg)
+  unsend_msg[0].content = username+" has unsend the message"
+  unsend_msg[0].from = "delete"
+  console.log("findMessage unsend_msg",unsend_msg)
+  // messageStorage[indexRoom].messages = messageStorage[indexRoom].messages.filter(message => message.id != id);
   console.log("Current ", messageStorage[indexRoom].messages);
 }
 
@@ -417,7 +424,7 @@ io.on("connection", (socket) => {
 
     // broadcast the updated message to all connected clients
     //nameWithId
-    findMessage(data.room, data.id);
+    findMessage(data.room, data.id,data.username);
     io.emit("unsendMessage", data);
   });
 
