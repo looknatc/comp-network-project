@@ -18,7 +18,9 @@
     <div class="chat-container">
       <header class="chat-header">
         <h1><i class="fas fa-cat"></i> Chatshire</h1>
-        <div class = "leave-container"><h3 id="me"></h3><a id="leave-btn" class="btn">Leave DM</a></div>
+        <div class = "leave-container">
+          <h3 id="me"></h3>
+          <a id="leave-btn" class="btn">Leave DM</a></div>
         
       </header>
       <main class="dm-main">
@@ -28,8 +30,17 @@
           <!-- <h3><i class="fas fa-users"></i> Users</h3>
           <ul id="users"></ul> -->
         </div>
+        <div class = 'chat-panel'>
+          <div class = 'search-wrapper'>
+            <!-- <i class='fas fa-search'></i> -->
+            <input type = 'search' id = 'searchbar' placeholder="Search message.." data-search>
+            <div class = 'search-next-container'>
+              <a class="prev-search-btn" type="button"><i class="fas fa-regular fa-chevron-up"></i></a>
+              <a class="next-search-btn" type="button" ><i class="fas fa-regular fa-chevron-down"></i></a>
+            </div>
+          </div>
         <div class="chat-messages"></div>
-
+    </div>
       </main>
       <div class="chat-form-container">
         <form id="dm-form">
@@ -204,4 +215,78 @@ leaveButton.addEventListener('click', () => {
   // } else {
   // }
 });
+
+/* 
+#############################
+    search meassage
+#############################
+*/
+const searchInput = document.querySelector("[data-search]");
+const searchBtn = document.querySelector(".search-btn");
+const searchBar = document.querySelector(".search-wrapper");
+const prevSearchBtn = document.querySelector(".prev-search-btn");
+const nextSerachBtn = document.querySelector(".next-search-btn");
+
+var matchingMessage = [];
+let currentIdx = -1;
+
+const clearMessage = () => {
+  for (var i = 0; i < matchingMessage.length; i++) {
+    matchingMessage[i].setAttribute("class", "text");
+  }
+};
+
+// Click Enter after fill in the search bar
+
+searchInput.addEventListener("search", (e) => {
+  e.preventDefault();
+  currentIdx = -1;
+  const value = e.target.value;
+  const allMessages = document.querySelectorAll(".chat-messages .text");
+    clearMessage();
+
+
+  for (var i = 0; i < allMessages.length; i++) {
+    // messageSender[i].scrollIntoView();
+    if (value != "" && allMessages[i].textContent.includes(value)) {
+      allMessages[i].setAttribute("class", "highlight-text");
+      matchingMessage.push(allMessages[i]);
+    } else {
+      allMessages[i].setAttribute("class", "text");
+    }
+  }
+});
+// for scroll to the result of search
+searchInput.addEventListener("keydown", (e) => {
+  const key = e.key;
+  if (key == "ArrowUp") {
+    next();
+  }
+  if (key == "ArrowDown") {
+    previous();
+  }
+});
+
+// Click  arrow up search -> scroll to previous result
+prevSearchBtn.addEventListener("click", (e) => {
+  console.log(e);
+  previous();
+});
+
+//Click arrow down search -> scroll to next result
+nextSerachBtn.addEventListener("click", (e) => {
+  next();
+  console.log(e);
+});
+
+const next = () => {
+  currentIdx = currentIdx + 1 > matchingMessage.length - 1 ? 0 : currentIdx + 1;
+  matchingMessage[currentIdx].scrollIntoView();
+};
+
+const previous = () => {
+  currentIdx = currentIdx - 1 < 0 ? matchingMessage.length - 1 : currentIdx - 1;
+  matchingMessage[currentIdx].scrollIntoView();
+};
+
 </script>

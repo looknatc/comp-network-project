@@ -6,6 +6,11 @@ const leaveButton = document.getElementById("leave-btn");
 const roomList = document.getElementById("room");
 const myName = document.getElementById("me");
 
+// for search
+const searchInput = document.querySelector("[data-search]");
+const searchBar = document.querySelector(".search-wrapper");
+const prevSearchBtn = document.querySelector(".prev-search-btn");
+const nextSerachBtn = document.querySelector(".next-search-btn");
 // const rooms = ['Java','PHP']
 // Get username and room from URL
 const { username, room } = Qs.parse(location.search, {
@@ -170,7 +175,6 @@ leaveButton.addEventListener("click", () => {
   const urlParams = new URLSearchParams(window.location.search);
   const username = urlParams.get("username");
   window.location = "../index.html?username=" + username;
-
 });
 
 // add Date to chat panel
@@ -180,3 +184,88 @@ function outputDate(date) {
   div.innerHTML = `<p class="meta">${date}</p> `;
   document.querySelector(".chat-messages").appendChild(div);
 }
+/*
+############################
+    search function
+############################
+*/
+
+var matchingMessage = [];
+let currentIdx = -1;
+
+const clearMessage = () => {
+  for (var i = 0; i < matchingMessage.length; i++) {
+    matchingMessage[i].setAttribute("class", "text");
+  }
+};
+
+// searchBtn.addEventListener("click", (e) => {
+//   if (searchBar.className == "search-wrapper show") {
+//     clearMessage();
+//   }
+//   searchBar.classList.toggle("show");
+// });
+
+// document.addEventListener("click", function (event) {
+//   // If the user clicked outside of the search bar, hide it
+//   console.log(searchBar);
+//   if (
+//     searchBar.className == "search-wrapper show" &&
+//     !searchBar.contains(event.target) &&
+//     event.target !== searchBtn &&
+//     event.target !== searchBar &&
+//     event.target.className != "fas fa-search"
+//   ) {
+//     searchBar.classList.toggle("show");
+//     clearMessage();
+//   }
+// });
+// Click Enter after fill in the search bar
+
+searchInput.addEventListener("search", (e) => {
+  e.preventDefault();
+  currentIdx = -1;
+  const value = e.target.value;
+  const allMessages = document.querySelectorAll(".chat-messages .text");
+  clearMessage();
+  for (var i = 0; i < allMessages.length; i++) {
+    // messageSender[i].scrollIntoView();
+    if (value != "" && allMessages[i].textContent.includes(value)) {
+      allMessages[i].setAttribute("class", "highlight-text");
+      matchingMessage.push(allMessages[i]);
+    } else {
+      allMessages[i].setAttribute("class", "text");
+    }
+  }
+});
+// for scroll to the result of search
+searchInput.addEventListener("keydown", (e) => {
+  const key = e.key;
+  if (key == "ArrowUp") {
+    next();
+  }
+  if (key == "ArrowDown") {
+    previous();
+  }
+});
+
+// Click  arrow up search -> scroll to previous result
+prevSearchBtn.addEventListener("click", (e) => {
+  console.log(e);
+  previous();
+});
+
+//Click arrow down search -> scroll to next result
+nextSerachBtn.addEventListener("click", (e) => {
+  next();
+  console.log(e);
+});
+const next = () => {
+  currentIdx = currentIdx + 1 > matchingMessage.length - 1 ? 0 : currentIdx + 1;
+  matchingMessage[currentIdx].scrollIntoView();
+};
+
+const previous = () => {
+  currentIdx = currentIdx - 1 < 0 ? matchingMessage.length - 1 : currentIdx - 1;
+  matchingMessage[currentIdx].scrollIntoView();
+};
