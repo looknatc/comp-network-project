@@ -396,9 +396,10 @@ io.on("connection", (socket) => {
         toUser = arr[3];
       }
       room = getRoom(toUser);
+      // nat1/5
       if (room) {
         console.log("getRoom(toUser)", room);
-        if (room.room == "DM") {
+        if (room.room == "DM" | !(/^([^?]+\?){3}[^?]+$/.test(room.room))) {
           updateRead(toUser, user.room, 1); //status 1 = has unread
           io.to(room.id).emit("alertDM", formatMessage(user.username, msg));
         }

@@ -7,7 +7,9 @@ var allUsers= [];
 //   return users.filter((user) => user.room === targetRoom);
 // }
 function getRoom(username){
-  return users.find((user) => user.username === username);
+  var ret = users.find((user) => user.username === username);
+  console.log("getRoom",username,ret)
+  return ret
 }
 //return user in system
 function getAllUsers(){
